@@ -8,8 +8,8 @@ from collections import Counter
 import time
 
 # USAGE:
-# python3 SmearEventsGeneral.py <name of nexus input file name (remove .h5 extension)> <Scale Factor> <DL> <DT>
-# e.g. python3 SmearEventsGeneral.py /Users/mistryk2/Packages/nexus/ATPC_0nuBB 1 0.408 1.440
+# python3 SmearEventsGeneral.py <name of nexus input file name (remove .h5 extension)> <Scale Factor> <DL> <DT> <bin>
+# e.g. python3 SmearEventsGeneral.py /Users/mistryk2/Packages/nexus/ATPC_0nuBB 1 0.408 1.440 1
 
 # Record the start time
 start_time = time.time()
@@ -25,15 +25,15 @@ print("Finished loading hits")
 rng = np.random.default_rng()
 
 # Diffusion values desired
-DL = float(0.0) # mm / sqrt(cm)
-DT = float(0.0) # mm / sqrt(cm)
+DL = float(sys.argv[3]) # mm / sqrt(cm)
+DT = float(sys.argv[4]) # mm / sqrt(cm)
 
 # This is the scaling amount of diffusion
 # scaling factor is in number of sigma of the diffusion values
 # can set to zero for no diffusion, or 1 for default diffusion scaling of 1 sigma
 diff_scaling = float(sys.argv[2])
 
-binsize = int(sys.argv[3])
+binsize = int(sys.argv[5])
 
 # Create the bins
 # Configure here based on the detector geometry dimentions [mm]
@@ -332,8 +332,8 @@ for index, e in enumerate(hits.event_id.unique()):
 
 df_smear_merge = pd.concat(df_smear, ignore_index=True)
 
-print("Saving events to file: ", sys.argv[1]+binsize+"mm_smear.h5")
-with pd.HDFStore(sys.argv[1]+"_smear.h5", mode='w', complevel=5, complib='zlib') as store:
+print("Saving events to file: ", sys.argv[1]+"_"+str(binsize)+"mm_smear.h5")
+with pd.HDFStore(sys.argv[1]+"_"+str(binsize)+"mm_smear.h5", mode='w', complevel=5, complib='zlib') as store:
     # Write each DataFrame to the file with a unique key
     store.put('MC/particles', parts, format='table')
     store.put('MC/hits', df_smear_merge, format='table')

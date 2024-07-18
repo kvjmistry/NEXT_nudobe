@@ -23,4 +23,4 @@
 /nexus/RegisterEventAction DefaultEventAction
 /nexus/RegisterTrackingAction DefaultTrackingAction
 
-/nexus/RegisterMacro macros/ATPC_BSM.config.mac
+/nexus/RegisterMacro ATPC_BSM.config.mac

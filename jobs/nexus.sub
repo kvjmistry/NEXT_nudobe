@@ -3,12 +3,15 @@
 # The job title here.
 jobname=nudobe
 
+#MODEL=mLRSM_SM_M1
+#MODEL=mLRSM_SM_M2
+#MODEL=mLRSM_SM_M3
+#MODEL=mLRSM_SM_M4
 MODEL=Leptoquark_SM
+
 
 CONFIG=ATPC_BSM.config.mac
 INIT=ATPC_BSM.init.mac
-
-script=SmearEventsGeneral.py
 
 OSDF_LOCATION=osdf:///ospool/ap40/data/krishan.mistry/
 HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe/
@@ -18,7 +21,7 @@ HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe/
 NewProcess = $(Process)
 
 executable = $(jobname)_job.sh
-arguments = $(NewProcess) $(jobname) $(script) $(MODEL)
+arguments = $(NewProcess) $(jobname) $(MODEL)
 
 # Specify the name of the log, standard error, and standard output (or "screen output") files. Wherever you see $(Cluster), HTCondor will insert the 
 #  queue number assigned to this set of jobs at the time of submission.
@@ -27,7 +30,7 @@ error  = jobs/$(jobname)/$(BIN)mm/jobid$(NewProcess)/$(Cluster)_$(NewProcess).er
 output = jobs/$(jobname)/$(BIN)mm/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
 
 # Transfer input files
-transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/config/$(script),$(HOME_LOCATION)/files/$(MODEL).txt
+transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/config/SmearEventsGeneral.py,$(HOME_LOCATION)/config/CompressEvents.py,$(HOME_LOCATION)/files/$(MODEL).txt
 
 # Transfer output files
 transfer_output_remaps = "$nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(ScaleFactor)/$(MODEL)_$(Cluster)_$(NewProcess).tar"
@@ -50,4 +53,4 @@ request_disk = 5GB
 # max_idle = 2000
 
 # Tell HTCondor the number of instances to run:
-queue 100
+queue 400

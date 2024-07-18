@@ -20,7 +20,7 @@ echo "Setting Up NEXUS"
 source /software/nexus/setup_nexus.sh
 
 # Set the configurable variables
-N_EVENTS=100
+N_EVENTS=1
 CONFIG=ATPC_BSM.config.mac
 INIT=ATPC_BSM.init.mac
 
@@ -32,7 +32,7 @@ echo "The seed number is: ${SEED}"
 # Change the config in the files
 sed -i "s#.*random_seed.*#/nexus/random_seed ${SEED}#" ${CONFIG}
 sed -i "s#.*start_id.*#/nexus/persistency/start_id ${SEED}#" ${CONFIG}
-sed -i "s#.*output_file.*#/nexus/persistency/output_file ${MODEL}#" ${CONFIG}
+sed -i "s#.*output_file.*#/nexus/persistency/output_file ${MODEL}_${JOBID}#" ${CONFIG}
 sed -i "s#.*dist_file.*#/Generator/ElecPair/dist_file ${MODEL}.txt#" ${CONFIG}
 
 # Print out the config and init files
@@ -43,15 +43,27 @@ cat ${CONFIG}
 echo "Running NEXUS" 
 nexus -n $N_EVENTS ${INIT}
 
+# Compress the file
+python3 CompressEvents.py ${MODEL}_${JOBID}
+
 # Loop over different bin sizes
-for BIN in {1..5}
+for BIN in {1,2,4,10}
 do
-    python3 ${SCRIPT} ${MODEL} ${BIN}
+    echo "Running with Bin: $BIN mm"
+    python3 SmearEventsGeneral.py ${MODEL}_${JOBID} 0 0.4 0.4 ${BIN}
 done
 
 ls -ltrh
 
-tar -cvf *.h5 nudobe.tar
+tar -cvf nudobe.tar *.h5
+
+# Cleanup
+rm *.h5
+rm *.mac
+rm *.txt
+rm *.py
+
+ls -ltrh
 
 echo "FINISHED....EXITING" 
 
