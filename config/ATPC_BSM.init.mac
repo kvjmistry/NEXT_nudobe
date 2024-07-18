@@ -1,0 +1,26 @@
+## ----------------------------------------------------------------------------
+## nexus | ATPC_BSM.init.mac
+##
+## Initialization macro to simulate 2e- events in the ATPC geom with nudobe 
+##
+## The NEXT Collaboration
+## ----------------------------------------------------------------------------
+
+/PhysicsList/RegisterPhysics G4EmStandardPhysics_option4
+#/PhysicsList/RegisterPhysics G4EmStandardPhysicsSS
+/PhysicsList/RegisterPhysics G4DecayPhysics
+/PhysicsList/RegisterPhysics G4RadioactiveDecayPhysics
+/PhysicsList/RegisterPhysics NexusPhysics
+/PhysicsList/RegisterPhysics G4StepLimiterPhysics
+
+/nexus/RegisterGeometry ATPC
+
+/nexus/RegisterGenerator ElecPairGenerator
+
+/nexus/RegisterPersistencyManager PersistencyManager
+
+/nexus/RegisterRunAction DefaultRunAction
+/nexus/RegisterEventAction DefaultEventAction
+/nexus/RegisterTrackingAction DefaultTrackingAction
+
+/nexus/RegisterMacro macros/ATPC_BSM.config.mac

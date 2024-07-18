@@ -1,0 +1,28 @@
+# VERBOSITY
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+/process/em/verbose 0
+
+# GENERATION
+/Generator/ElecPair/region AD_HOC
+/Generator/ElecPair/dist_file data/nudobe/Leptoquark_SM.txt
+
+
+## Nexus Physics List
+/PhysicsList/Nexus/clustering           false
+/PhysicsList/Nexus/drift                false
+/PhysicsList/Nexus/electroluminescence  false
+
+#GEOMETRY
+/Geometry/ATPC/gas_pressure 5. bar
+/Geometry/ATPC/cube_size  6 m
+/Geometry/ATPC/chamber_thickn 5 cm
+/Geometry/ATPC/max_step_size 1 mm
+
+/nexus/random_seed 12
+/nexus/persistency/start_id 12
+
+# PERSISTENCY
+#/nexus/persistency/eventType background
+/nexus/persistency/output_file ATPC_BSM
