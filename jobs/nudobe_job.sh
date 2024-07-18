@@ -20,7 +20,7 @@ echo "Setting Up NEXUS"
 source /software/nexus/setup_nexus.sh
 
 # Set the configurable variables
-N_EVENTS=1
+N_EVENTS=25
 CONFIG=ATPC_BSM.config.mac
 INIT=ATPC_BSM.init.mac
 
