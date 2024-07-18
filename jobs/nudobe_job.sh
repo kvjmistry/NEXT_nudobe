@@ -19,6 +19,14 @@ start=`date +%s`
 echo "Setting Up NEXUS" 
 source /software/nexus/setup_nexus.sh
 
+
+# Re-source this stuff for now. There seems to be a G4 installation on some machines
+export G4INSTALL=/software/geant4-v11.1.0/install;
+export PATH=$G4INSTALL/bin:$PATH;
+export LD_LIBRARY_PATH=$G4INSTALL/lib:$LD_LIBRARY_PATH;
+cd $G4INSTALL/bin; source geant4.sh; cd -;
+
+
 # Set the configurable variables
 N_EVENTS=25
 CONFIG=ATPC_BSM.config.mac
