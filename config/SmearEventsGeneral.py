@@ -38,21 +38,24 @@ binsize = int(sys.argv[5])
 # Create the bins
 # Configure here based on the detector geometry dimentions [mm]
 # set detector active range with min, max and bin width in mm
-xmin=-3000
-xmax=3000
 xbw=binsize
+xmin=-3000 - binsize/2 
+xmax=3000 + binsize/2
 
-ymin=-3000
-ymax=3000
 ybw=binsize
+ymin=-3000 - binsize/2 
+ymax=3000 + binsize/2
 
-zmin=0
-zmax=6000
-zbw=binsize
 
 # This shifts the z pos of the events so 0 is at anode
 # can set this to zero
-z_shift = (zmax-zmin)/2.0
+# z_shift = (zmax-zmin)/2.0
+z_shift = 0
+
+zbw=binsize
+zmin=-3000 + z_shift - binsize/2 
+zmax=3000 + z_shift + binsize/2
+
 
 # Mean energy per e-. This splits up each G4 into E_hit/E_mean electrons
 E_mean = 25e-6 # [eV]
@@ -78,23 +81,15 @@ zbin_c = zbins[:-1] + zbw / 2
 df_smear = []
 
 # Define a function to smear the geant4 electrons uniformly between the steps
-# Each electron is sampled uniformly half-way to the next hit and
-# half-way towards the previous hit (based on step length)
-# The ends of the track are sampled in the forward direction only 
+# Each electron is sampled uniformly towards the previous hit
+# The ends of the track are sampled in the backward direction only 
 def generate_random(row):
     r0 = np.array([row['x'], row['y'], row['z']])
-    r1 = np.array([row['x'] - row['dx1']/2.0, row['y'] - row['dy1']/2.0, row['z'] - row['dz1']/2.0]) # backward delta
-    r2 = np.array([row['x'] + row['dx2']/2.0, row['y'] + row['dy2']/2.0, row['z'] + row['dz2']/2.0]) # forward delta
+    r1 = np.array([row['x'] - row['dx'], row['y'] - row['dy'], row['z'] - row['dz']]) # backward delta
     
-    # Randomly pick to either move the electron forward or backward from the hit
-    sampled_direction = np.random.choice([1, 2], p=[0.5, 0.5])
-
-    if (sampled_direction == 1):
-        random_number = rng.uniform(0, 1)
-        new_r = r0+random_number*(r1 - r0)
-    else:
-        random_number = rng.uniform(0, 1)
-        new_r = r0+random_number*(r2 - r0)
+    # Uniformly move the backward from the hit by its step size
+    random_number = rng.uniform(0, 1)
+    new_r = r0+random_number*(r1 - r0)
 
     x_smear, y_smear, z_smear = new_r[0], new_r[1], new_r[2]
 
@@ -151,16 +146,21 @@ for index, e in enumerate(hits.event_id.unique()):
     for idx, p in enumerate(particles):
 
         # Get hits for particle i in the event
-        temp_part = event[event.particle_id == p]
-        particle_name = event_part[event_part.particle_id == p].particle_name.iloc[0]
+        temp_part_hits = event[event.particle_id == p]
+        temp_part = event_part[event_part.particle_id == p]
+        particle_name = temp_part.particle_name.iloc[0]
 
-        nrows = len(temp_part)
+        nrows = len(temp_part_hits)
 
         # This dataframe contains the difference in distance between hits
-        diff_df = temp_part[['x', 'y', 'z']].diff()
-        diff_df.iloc[0] = 0
-        extra_row = pd.DataFrame({'x': [0], 'y': [0], 'z': [0]})
-        diff_df = pd.concat([diff_df, extra_row])
+        diff_df = temp_part_hits[['x', 'y', 'z']].diff()
+
+        # Set the dist for the first hit as the difference to the inital position
+        diff_df.iloc[0, diff_df.columns.get_loc('x')] = temp_part_hits.iloc[0].x - temp_part.initial_x.iloc[0]
+        diff_df.iloc[0, diff_df.columns.get_loc('y')] = temp_part_hits.iloc[0].y - temp_part.initial_y.iloc[0]
+        diff_df.iloc[0, diff_df.columns.get_loc('z')] = temp_part_hits.iloc[0].z - temp_part.initial_z.iloc[0]
+
+        # Name the columns by their deltas
         diff_df = diff_df.rename(columns={'x': 'dx', 'y': 'dy', 'z': 'dz'})
 
         # We dont want to smear over the gamma steps
@@ -170,38 +170,7 @@ for index, e in enumerate(hits.event_id.unique()):
             diff_df["dy"] = 0*diff_df["dy"]
             diff_df["dz"] = 0*diff_df["dz"]
         
-        dx1 = [] # backward delta from hit
-        dy1 = []
-        dz1 = []
-        dx2 = [] # forward delta from hit
-        dy2 = []
-        dz2 = []
-        index_arr = []
-
-        # Get arrays for the distance dataframes
-        for index in range(len(diff_df)-1):
-            dx1.append(diff_df.iloc[index].dx)
-            dy1.append(diff_df.iloc[index].dy)
-            dz1.append(diff_df.iloc[index].dz)
-            dx2.append(diff_df.iloc[index+1].dx)
-            dy2.append(diff_df.iloc[index+1].dy)
-            dz2.append(diff_df.iloc[index+1].dz)
-
-        index_arr = diff_df.index.to_numpy()
-        index_arr = index_arr[:-1]
-
-        # Make a dataframe of the deltas
-        data = {
-            'dx1': dx1,
-            'dx2': dx2,
-            'dy1': dy1,
-            'dy2': dy2,
-            'dz1': dz1,
-            'dz2': dz2,
-        }
-
-        new_df = pd.DataFrame(data, index=index_arr)
-        smear_df.append(new_df)
+        smear_df.append(diff_df)
 
     # Concatenate DataFrames along rows (axis=0)
     smear_df = pd.concat(smear_df)
@@ -210,7 +179,7 @@ for index, e in enumerate(hits.event_id.unique()):
     event = pd.merge(event, smear_df, left_index=True, right_index=True, how='inner')
 
     # Create a new DataFrame with duplicated rows, so we can smear each electron by diffusion
-    electrons = pd.DataFrame(np.repeat(event[["event_id",'x', 'y', 'z', 'dx1', 'dx2', 'dy1', 'dy2', 'dz1','dz2']].values, event['n'], axis=0), columns=["event_id",'x', 'y', 'z', 'dx1', 'dx2', 'dy1', 'dy2', 'dz1','dz2'])
+    electrons = pd.DataFrame(np.repeat(event[["event_id",'x', 'y', 'z', 'dx', 'dy', 'dz']].values, event['n'], axis=0), columns=["event_id",'x', 'y', 'z', 'dx', 'dy', 'dz'])
 
     # Reset the index of the new DataFrame if needed
     electrons = electrons.reset_index(drop=True)
@@ -225,6 +194,7 @@ for index, e in enumerate(hits.event_id.unique()):
     electrons_smear['x'] = electrons_smear['x_smear']
     electrons_smear['y'] = electrons_smear['y_smear']
     electrons_smear['z'] = electrons_smear['z_smear']
+
 
     # Now lets bin the data
     electrons_smear['x_smear'] = pd.cut(x=electrons_smear['x_smear'], bins=xbins,labels=xbin_c, include_lowest=True)
