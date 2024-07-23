@@ -11,7 +11,8 @@ start=`date +%s`
 echo "The JOBID is ${SLURM_ARRAY_TASK_ID}" 
  
 # Set the configurable variables
-
+# Model_NME_binning
+JOBNAME="Leptoquark_SM"
 BINNING="nexus"
 H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_${BINNING}.h5"
 EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
