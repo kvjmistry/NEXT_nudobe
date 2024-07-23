@@ -21,8 +21,8 @@ EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
 N=100 # The number of segments to run -- 1-103 slurm
 
 # Create the directory
-mkdir -p ${JOBNAME}_${BINNING}"
-cd ${JOBNAME}_${BINNING}"
+mkdir -p "${JOBNAME}_${BINNING}"
+cd "${JOBNAME}_${BINNING}"
 
 # Setup VENV so we have python
 echo "Setting Up Python" 
