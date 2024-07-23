@@ -1,6 +1,6 @@
 #!/bin/bash 
 Model="Leptoquark_SM"
-mkdir merged
+mkdir -p merged
 
 for f in $(ls ${Model}_nexus); do cat ${Model}_nexus/$f >> merged/${Model}_nexus_reco_merged.txt;done
 for f in $(ls ${Model}_1mm_smear); do cat ${Model}_1mm_smear/$f >> merged/${Model}_1mm_smear_reco_merged.txt;done
