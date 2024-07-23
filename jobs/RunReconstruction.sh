@@ -17,6 +17,12 @@ BINNING="nexus"
 H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_${BINNING}.h5"
 EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
 
+echo "JOBNAME is: ${JOBNAME}"
+echo "BINNING is: ${BINNING}"
+echo "H5File is: ${H5FILE}"
+echo "EVENTFILE is: ${EVENTFILE}"
+
+
 # Set the configurable variables
 N=100 # The number of segments to run -- 1-103 slurm
 
