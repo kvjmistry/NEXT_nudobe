@@ -1,18 +1,22 @@
 #!/bin/bash
+
+
+# Model_NME
+export JOBNAME="Leptoquark_SM"
+
 #SBATCH -J GN # A single job name for the array
 #SBATCH --nodes=1
 #SBATCH --mem 4000 # Memory request (6Gb)
 #SBATCH -t 0-24:00 # Maximum execution time (D-HH:MM)
-#SBATCH -o GN_%A_%a.out # Standard output
-#SBATCH -e GN_%A_%a.err # Standard error
+#SBATCH -o ${JOBNAME}/log/GN_%A_%a.out # Standard output
+#SBATCH -e ${JOBNAME}/log/GN_%A_%a.err # Standard error
 
 start=`date +%s`
 
 echo "The JOBID is ${SLURM_ARRAY_TASK_ID}" 
  
 # Set the configurable variables
-# Model_NME_binning
-JOBNAME="Leptoquark_SM"
+
 BINNING="nexus"
 H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_${BINNING}.h5"
 EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
