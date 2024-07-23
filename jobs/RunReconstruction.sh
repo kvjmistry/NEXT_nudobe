@@ -8,7 +8,7 @@
 
 start=`date +%s`
 
-echo "The JOBID is ${SLURM_ARRAY_TASK_ID}" | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+echo "The JOBID is ${SLURM_ARRAY_TASK_ID}" 
  
 # Set the configurable variables
 # Model_NME_binning
@@ -21,11 +21,12 @@ EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
 N=100 # The number of segments to run
 
 # Create the directory
+cd /media/argon/HDD_8tb/Krishan/
 mkdir -p $JOBNAME_${event_list}/jobid_"${SLURM_ARRAY_TASK_ID}"
 cd $JOBNAME_${event_list}/jobid_"${SLURM_ARRAY_TASK_ID}"
 
 # Setup IC so we have python
-echo "Setting Up IC" 2>&1 | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+echo "Setting Up IC" 
 source /home/argon/Projects/Krishan/IC/setup_IC.sh
 
 # Get the total number of lines in the file
@@ -46,18 +47,18 @@ echo "End line is: ${end_line}"
 sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${SLURM_ARRAY_TASK_ID}.txt
 
 # Run the reco
-echo "Running Reco" 2>&1 | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
-python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}"  2>&1 | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+echo "Running Reco" 
+python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}"  
 
-ls -ltrh  2>&1 | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+ls -ltrh
 
 echo; echo; echo;
 
-echo "FINISHED....EXITING" 2>&1 | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+echo "FINISHED....EXITING" 
 
 end=`date +%s`
 let deltatime=end-start
 let hours=deltatime/3600
 let minutes=(deltatime/60)%60
 let seconds=deltatime%60
-printf "Time spent: %d:%02d:%02d\n" $hours $minutes $seconds | tee -a log_"${SLURM_ARRAY_TASK_ID}".txt
+printf "Time spent: %d:%02d:%02d\n" $hours $minutes $seconds 
