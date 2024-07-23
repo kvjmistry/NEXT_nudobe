@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-import tables as tb
-import matplotlib.pyplot as plt
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse.csgraph import depth_first_order
 from scipy.sparse import csr_matrix
@@ -258,7 +256,8 @@ def add_reco_hit_id_column_vertex_seed_fun():
         reco_hit_id -= 1
     df_reco_particle_id2 = pd.DataFrame({'global_hit_id': list(my_dict2.keys()), 'reco_hit_id': list(my_dict2.values())})
 
-    df_reco_particle_id = df_reco_particle_id1.append(df_reco_particle_id2, ignore_index=True)
+    # df_reco_particle_id = df_reco_particle_id1.append(df_reco_particle_id2, ignore_index=True)
+    df_reco_particle_id = pd.concat([df_reco_particle_id1, df_reco_particle_id2], ignore_index=True) # append depreciated in some pandas versions
     #df_reco_particle_id
     
     # Fourth, merge df with 'reco_hit_id' into hits df. Reorder rows by 'reco_hit_id'
@@ -453,4 +452,4 @@ mydict_reco = {'event_id':event_id_arr,
            'costheta_reco':costheta_reco_arr}
 
 df_reco = pd.DataFrame(mydict_reco) 
-df_reco.to_csv(file_out, sep=',', index=False) 
+df_reco.to_csv(file_out, sep=',', index=False, header=False) 

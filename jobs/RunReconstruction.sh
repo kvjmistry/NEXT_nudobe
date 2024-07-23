@@ -18,16 +18,16 @@ H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_${BINNING}.h5"
 EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
 
 # Set the configurable variables
-N=100 # The number of segments to run
+N=100 # The number of segments to run -- 1-103 slurm
 
 # Create the directory
 cd /media/argon/HDD_8tb/Krishan/
 mkdir -p $JOBNAME_${event_list}/jobid_"${SLURM_ARRAY_TASK_ID}"
 cd $JOBNAME_${event_list}/jobid_"${SLURM_ARRAY_TASK_ID}"
 
-# Setup IC so we have python
-echo "Setting Up IC" 
-source /home/argon/Projects/Krishan/IC/setup_IC.sh
+# Setup VENV so we have python
+echo "Setting Up Python" 
+source /home/argon/Projects/Krishan/venv/bin/activate
 
 # Get the total number of lines in the file
 total_lines=$(wc -l < ${EVENTFILE})
@@ -50,6 +50,7 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${SLURM_ARRAY_TASK_ID
 echo "Running Reco" 
 python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}"  
 
+rm segment_${SLURM_ARRAY_TASK_ID}.txt
 ls -ltrh
 
 echo; echo; echo;
