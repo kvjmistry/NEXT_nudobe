@@ -414,7 +414,7 @@ costheta_reco_arr = np.zeros(nevts)
 print('event_id, T1_gen, costheta_gen, T1_reco, costheta_reco')
 
 # Event loop should go here
-for index, evt_id in enumerate(df_particles_allevts.event_id.unique()):
+for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
 
     # Only particles and hits from event_id = evt_id, to deal one event at the time
     df_particles = df_particles_allevts[df_particles_allevts.event_id == evt_id]
