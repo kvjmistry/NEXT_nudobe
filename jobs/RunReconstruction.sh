@@ -1,15 +1,10 @@
 #!/bin/bash
-
-
-# Model_NME
-export JOBNAME="Leptoquark_SM"
-
 #SBATCH -J GN # A single job name for the array
 #SBATCH --nodes=1
 #SBATCH --mem 4000 # Memory request (6Gb)
 #SBATCH -t 0-24:00 # Maximum execution time (D-HH:MM)
-#SBATCH -o ${JOBNAME}/log/GN_%A_%a.out # Standard output
-#SBATCH -e ${JOBNAME}/log/GN_%A_%a.err # Standard error
+#SBATCH -o log/GN_%A_%a.out # Standard output
+#SBATCH -e log/GN_%A_%a.err # Standard error
 
 start=`date +%s`
 
