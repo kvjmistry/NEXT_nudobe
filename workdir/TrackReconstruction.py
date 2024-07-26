@@ -291,7 +291,7 @@ def RunReco(data, part):
     # If there is no Track1 or Track2 then return failed reco value
     if (track1 == 0 or track2 == 0):
         print("Error!! No track1 or track 2 in final reconstruction...")
-        return -1, -1, -1, -1, -1, connected_nodes, UpdatedTracks
+        return -9, -9, -9, -9, -9, connected_nodes, UpdatedTracks
 
     # ID the track with the lowest label
     highest_track = "Track2"
@@ -430,7 +430,7 @@ for event_num in parts.event_id.unique():
     event_id_arr.append(event_num)
     T1_gen_arr.append(Gen_T1)
     costheta_gen_arr.append(Gen_cos_theta)
-    T1_reco_arr.append(Reco_cos_theta)
+    T1_reco_arr.append(Reco_T1)
     costheta_reco_arr.append(Reco_cos_theta)
     e_gammas_arr.append(e_gammas)
 
