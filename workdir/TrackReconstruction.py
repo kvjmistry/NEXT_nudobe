@@ -6,6 +6,7 @@ import copy
 import itertools
 import matplotlib.pyplot as plt
 from TrackReconstruction_functions import *
+import sys
 
 
 
@@ -378,11 +379,31 @@ def RunReco(data, part):
     return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks
 
 
-# hits = pd.read_hdf('../../NEXT_nudobe/files/data/Leptoquark_SM_nexus.h5',"MC/hits")
-hits = pd.read_hdf('../../NEXT_nudobe/files/data/Leptoquark_SM_1mm_smear.h5',"MC/hits")
-parts = pd.read_hdf('../../NEXT_nudobe/files/data/Leptoquark_SM_1mm_smear.h5',"MC/particles")
+# USAGE: python TrackReconstruction.py <infile> <eventfile> <model>
+# python TrackReconstruction.py "Leptoquark_SM_nexus.h5"  "Leptoquark_SM_events.txt" "Leptoquark_SM"
 
-events = [1834, 1835, 1836, 1837, 1838, 1839, 1840]
+# Input file
+infile     = sys.argv[1]
+event_file = sys.argv[2]
+model      = sys.argv[3]
+file_out = f"{model}_reco.txt"
+
+
+# Load in a file with the events to process
+with open(event_file, 'r') as file:
+    event_list = [int(line.strip()) for line in file]
+
+hits = pd.read_hdf(infile,"MC/hits")
+parts = pd.read_hdf(infile,"MC/particles")
+hits = hits[hits.event_id.isin(event_list)]
+parts = parts[parts.event_id.isin(event_list)]
+
+event_id_arr      = []
+T1_gen_arr        = []
+costheta_gen_arr  = []
+T1_reco_arr       = []
+costheta_reco_arr = []
+e_gammas_arr      = []
 
 counter = 0
 
@@ -406,5 +427,23 @@ for event_num in parts.event_id.unique():
     print("Reco Cos Theta:", Reco_cos_theta)
     print("")
 
+    event_id_arr.append(event_num)
+    T1_gen_arr.append(Gen_T1)
+    costheta_gen_arr.append(Gen_cos_theta)
+    T1_reco_arr.append(Reco_cos_theta)
+    costheta_reco_arr.append(Reco_cos_theta)
+    e_gammas_arr.append(e_gammas)
+
     counter = counter+1
 
+# Fill a new pandas dataframe with the numpy arrays, then write to a csv file
+mydict_reco = {'event_id':event_id_arr,
+           'T1_gen':T1_gen_arr,
+           'costheta_gen':costheta_gen_arr,
+           'T1_reco':T1_reco_arr,
+           'costheta_reco':costheta_reco_arr,
+           'e_gammas_reco':e_gammas_arr}
+    
+
+df_reco = pd.DataFrame(mydict_reco) 
+df_reco.to_csv(file_out, sep=',', index=False, header=False) 
