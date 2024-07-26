@@ -40,7 +40,7 @@ cd "${JOBNAME}_${BINNING}"
 echo "Setting Up Python" 
 source /home/argon/Projects/Krishan/venv/bin/activate
 
-cp /home/argon/Projects/Krishan/NEXT_nudobe/scripts/TrackReconstruction_functions.py .
+cp /home/argon/Projects/Krishan/NEXT_nudobe/workdir/TrackReconstruction_functions.py .
 
 # Get the total number of lines in the file
 total_lines=$(wc -l < ${EVENTFILE})
@@ -62,7 +62,7 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${SLURM_ARRAY_TASK_ID
 # Run the reco
 echo "Running Reco" 
 # python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
-python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/TrackReconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
+python3 /home/argon/Projects/Krishan/NEXT_nudobe/workdir/TrackReconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
 
 rm segment_${SLURM_ARRAY_TASK_ID}.txt
 ls -ltrh
