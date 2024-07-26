@@ -390,10 +390,10 @@ def RunReco(data, part):
     # # Compute cosine of the angle between the vectors
     cos_theta1 = cosine_angle(direction_vector1, direction_vector2)
 
-    if (len_Track1 > 1):
+    if (len_Track1 > 2):
         cos_theta2 = cosine_angle(direction_vector2, direction_vector3)
 
-    if (len_Track2 > 1):
+    if (len_Track2 > 2):
         cos_theta3 = cosine_angle(direction_vector1, direction_vector4)
 
     Reco_cos_theta = min([cos_theta1,cos_theta2,cos_theta3], key=abs)
