@@ -372,19 +372,19 @@ def RunReco(data, part):
     Track1_node1 = np.array(Track1.iloc[1][0:3])
     Track2_node1 = np.array(Track2.iloc[1][0:3])
 
-    if (len_Track1 > 1):
+    if (len_Track1 > 2):
         Track1_node2 = np.array(Track1.iloc[2][0:3])
 
-    if (len_Track2 > 1):
+    if (len_Track2 > 2):
         Track2_node2 = np.array(Track2.iloc[2][0:3])
 
     direction_vector1 = Track1_node1 - vertex
     direction_vector2 = Track2_node1 - vertex
 
-    if (len_Track1 > 1):
+    if (len_Track1 > 2):
         direction_vector3 = Track1_node2 - vertex
 
-    if (len_Track2 > 1):
+    if (len_Track2 > 2):
         direction_vector4 = Track2_node2 - vertex
 
     # # Compute cosine of the angle between the vectors
