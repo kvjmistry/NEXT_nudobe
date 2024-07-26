@@ -365,16 +365,41 @@ def RunReco(data, part):
     Track2 = data[ (data.Track2 == 1) & (data.Track1 != 1)]
     Track2 = Track2.reindex(track2_indices)
 
+    len_Track1 = len(Track1)
+    len_Track2 = len(Track2)
+    cos_theta1 = 2; cos_theta2 = 2; cos_theta3 = 2
+
     Track1_node1 = np.array(Track1.iloc[1][0:3])
     Track2_node1 = np.array(Track2.iloc[1][0:3])
+
+    if (len_Track1 > 1):
+        Track1_node2 = np.array(Track1.iloc[2][0:3])
+
+    if (len_Track2 > 1):
+        Track2_node2 = np.array(Track2.iloc[2][0:3])
 
     direction_vector1 = Track1_node1 - vertex
     direction_vector2 = Track2_node1 - vertex
 
-    # # Compute cosine of the angle between the vectors
-    Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
+    if (len_Track1 > 1):
+        direction_vector3 = Track1_node2 - vertex
 
-   
+    if (len_Track2 > 1):
+        direction_vector4 = Track2_node2 - vertex
+
+    # # Compute cosine of the angle between the vectors
+    cos_theta1 = cosine_angle(direction_vector1, direction_vector2)
+
+    if (len_Track1 > 1):
+        cos_theta2 = cosine_angle(direction_vector2, direction_vector3)
+
+    if (len_Track2 > 1):
+        cos_theta3 = cosine_angle(direction_vector1, direction_vector4)
+
+    Reco_cos_theta = min([cos_theta1,cos_theta2,cos_theta3], key=abs)
+
+    # # Compute cosine of the angle between the vectors
+    # Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
 
     return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks
 
