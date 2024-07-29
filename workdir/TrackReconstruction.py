@@ -10,7 +10,7 @@ import sys
 
 
 
-def RunReco(data, part, model):
+def RunReco(data, part):
 
     # There seems to be a duplicate row sometimes
     data = data.drop_duplicates()
@@ -358,10 +358,6 @@ def RunReco(data, part, model):
     vertex = data[ (data.Track1 == 1) & (data.Track2 == 1)]
     vertex = np.array([vertex.iloc[0].x,vertex.iloc[0].y,vertex.iloc[0].z])
 
-    # In the case of nexus, set the vertex to origin
-    if ("nexus" in model):
-        vertex = np.array([0,0,0])
-
     Track1 = data[ (data.Track1 == 1) & (data.Track2 != 1)]
     Track1 = Track1.reindex(track1_indices)
     Track1 = Track1.iloc[1:] # remove vertex index
@@ -370,7 +366,7 @@ def RunReco(data, part, model):
     Track2 = Track2.reindex(track2_indices)
     Track2 = Track2.iloc[1:] # remove vertex index
 
-    Reco_cos_theta, direction_vector1, direction_vector2 = CalcTrackAngle(Track1[Track1.distance < 15], Track2[Track2.distance < 15], vertex)
+    Reco_cos_theta, direction_vector1, direction_vector2 = CalcTrackAngle(Track1, Track2, vertex)
 
     # # Compute cosine of the angle between the vectors
     # Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
@@ -413,6 +409,11 @@ for event_num in parts.event_id.unique():
 
     hit = hits[hits.event_id == event_num]
     part = parts[parts.event_id == event_num]
+
+    # In the case of nexus, set the vertex to origin
+    if ("nexus" in model):
+        vertex = pd.DataFrame({'event_id': event_num, 'x': 0, 'y': 0, 'z': 0, 'energy': 0})
+        hit = pd.concat([hit, vertex], ignore_index=True)
 
     # print(hit)
 
