@@ -459,26 +459,26 @@ def FitTrack(Track, vertex):
     # Convert values to an array
     track_arr = Track[['x', 'y', 'z']].to_numpy()
 
-    if (len(track_arr) == 1):
-        return track_arr[0] - vertex
+    # if (len(track_arr) == 1):
+    return track_arr[0] - vertex
 
-    # Try fitting
-    x_array = Track['x'].to_numpy()
-    y_array = Track['y'].to_numpy()
-    z_array = Track['z'].to_numpy()
+    # # Try fitting
+    # x_array = Track['x'].to_numpy()
+    # y_array = Track['y'].to_numpy()
+    # z_array = Track['z'].to_numpy()
 
-    data_comb = np.vstack((x_array, y_array, z_array)).T
-    centered_data = data_comb - vertex
+    # data_comb = np.vstack((x_array, y_array, z_array)).T
+    # centered_data = data_comb - vertex
 
-    _, _, vv = np.linalg.svd(centered_data)
-    direction_vector = vv[0]
+    # _, _, vv = np.linalg.svd(centered_data)
+    # direction_vector = vv[0]
     
 
-    # Ensure the direction vector points away from the starting point
-    if np.dot(data_comb[1] - vertex, direction_vector) < 0:
-        direction_vector = -direction_vector
+    # # Ensure the direction vector points away from the starting point
+    # if np.dot(data_comb[1] - vertex, direction_vector) < 0:
+    #     direction_vector = -direction_vector
 
-    return direction_vector
+    # return direction_vector
 
 def CalcTrackAngle(Track1, Track2, vertex):
 
