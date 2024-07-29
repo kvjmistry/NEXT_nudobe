@@ -417,7 +417,7 @@ for event_num in parts.event_id.unique():
 
     # print(hit)
 
-    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks = RunReco(hit, part, model)
+    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks = RunReco(hit, part)
 
     print("Event: ",event_num)
     print("Gen  T1:",Gen_T1)
