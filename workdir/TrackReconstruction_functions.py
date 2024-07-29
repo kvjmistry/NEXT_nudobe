@@ -453,3 +453,50 @@ def FixTrackEnergies(UpdatedTracks, vertex_index, data):
         t["energy"] = e_sum
 
 
+
+def FitTrack(Track, vertex):
+
+    # Convert values to an array
+    track_arr = Track[['x', 'y', 'z']].to_numpy()
+
+    if (len(track_arr) == 1):
+        return track_arr[0] - vertex
+
+    # Try fitting
+    x_array = Track['x'].to_numpy()
+    y_array = Track['y'].to_numpy()
+    z_array = Track['z'].to_numpy()
+
+    data_comb = np.vstack((x_array, y_array, z_array)).T
+    centered_data = data_comb - vertex
+
+    _, _, vv = np.linalg.svd(centered_data)
+    direction_vector = vv[0]
+    
+
+    # Ensure the direction vector points away from the starting point
+    if np.dot(data_comb[1] - vertex, direction_vector) < 0:
+        direction_vector = -direction_vector
+
+    return direction_vector
+
+def CalcTrackAngle(Track1, Track2, vertex):
+
+    dir_track1 = FitTrack(Track1, vertex)
+    dir_track2 = FitTrack(Track2, vertex)
+    cosine = cosine_angle(dir_track1, dir_track2)
+
+    # Just check that first hit was not reco in the wrong direction
+    if (np.abs(cosine) > 0.97 and len(Track1) > 1):
+        dir_track1 = FitTrack(Track1.iloc[1:], vertex)
+        dir_track2 = FitTrack(Track2, vertex)
+        cosine = cosine_angle(dir_track1, dir_track2)
+        
+
+    if (np.abs(cosine) > 0.97  and len(Track2) > 1):
+        dir_track1 = FitTrack(Track1, vertex)
+        dir_track2 = FitTrack(Track2.iloc[1:], vertex)
+        cosine = cosine_angle(dir_track1, dir_track2)
+
+
+    return cosine, dir_track1, dir_track2

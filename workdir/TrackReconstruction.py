@@ -10,7 +10,7 @@ import sys
 
 
 
-def RunReco(data, part):
+def RunReco(data, part, model):
 
     # There seems to be a duplicate row sometimes
     data = data.drop_duplicates()
@@ -358,45 +358,19 @@ def RunReco(data, part):
     vertex = data[ (data.Track1 == 1) & (data.Track2 == 1)]
     vertex = np.array([vertex.iloc[0].x,vertex.iloc[0].y,vertex.iloc[0].z])
 
+    # In the case of nexus, set the vertex to origin
+    if ("nexus" in model):
+        vertex = np.array([0,0,0])
+
     Track1 = data[ (data.Track1 == 1) & (data.Track2 != 1)]
     Track1 = Track1.reindex(track1_indices)
-
+    Track1 = Track1.iloc[1:] # remove vertex index
 
     Track2 = data[ (data.Track2 == 1) & (data.Track1 != 1)]
     Track2 = Track2.reindex(track2_indices)
+    Track2 = Track2.iloc[1:] # remove vertex index
 
-    len_Track1 = len(Track1)
-    len_Track2 = len(Track2)
-    cos_theta1 = 2; cos_theta2 = 2; cos_theta3 = 2
-
-    Track1_node1 = np.array(Track1.iloc[1][0:3])
-    Track2_node1 = np.array(Track2.iloc[1][0:3])
-
-    if (len_Track1 > 2):
-        Track1_node2 = np.array(Track1.iloc[2][0:3])
-
-    if (len_Track2 > 2):
-        Track2_node2 = np.array(Track2.iloc[2][0:3])
-
-    direction_vector1 = Track1_node1 - vertex
-    direction_vector2 = Track2_node1 - vertex
-
-    if (len_Track1 > 2):
-        direction_vector3 = Track1_node2 - vertex
-
-    if (len_Track2 > 2):
-        direction_vector4 = Track2_node2 - vertex
-
-    # # Compute cosine of the angle between the vectors
-    cos_theta1 = cosine_angle(direction_vector1, direction_vector2)
-
-    if (len_Track1 > 2):
-        cos_theta2 = cosine_angle(direction_vector2, direction_vector3)
-
-    if (len_Track2 > 2):
-        cos_theta3 = cosine_angle(direction_vector1, direction_vector4)
-
-    Reco_cos_theta = min([cos_theta1,cos_theta2,cos_theta3], key=abs)
+    Reco_cos_theta, direction_vector1, direction_vector2 = CalcTrackAngle(Track1[Track1.distance < 15], Track2[Track2.distance < 15], vertex)
 
     # # Compute cosine of the angle between the vectors
     # Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
@@ -442,7 +416,7 @@ for event_num in parts.event_id.unique():
 
     # print(hit)
 
-    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks = RunReco(hit, part)
+    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks = RunReco(hit, part, model)
 
     print("Event: ",event_num)
     print("Gen  T1:",Gen_T1)
