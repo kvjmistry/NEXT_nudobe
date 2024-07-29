@@ -488,14 +488,14 @@ def CalcTrackAngle(Track1, Track2, vertex):
 
     # Just check that first hit was not reco in the wrong direction
     if (np.abs(cosine) > 0.97 and len(Track1) > 1):
-        dir_track1 = FitTrack(Track1.iloc[1:], vertex)
+        dir_track1 = FitTrack(Track1.iloc[1:2], vertex)
         dir_track2 = FitTrack(Track2, vertex)
         cosine = cosine_angle(dir_track1, dir_track2)
         
 
     if (np.abs(cosine) > 0.97  and len(Track2) > 1):
         dir_track1 = FitTrack(Track1, vertex)
-        dir_track2 = FitTrack(Track2.iloc[1:], vertex)
+        dir_track2 = FitTrack(Track2.iloc[1:2], vertex)
         cosine = cosine_angle(dir_track1, dir_track2)
 
 
