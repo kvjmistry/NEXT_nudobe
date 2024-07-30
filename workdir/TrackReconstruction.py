@@ -392,15 +392,18 @@ def RunReco(data, part):
 
 
     # Given vertex position
-    vertex = data[ (data.Track1 == 1) & (data.Track2 == 1)]
-    vertex = np.array([vertex.iloc[0].x,vertex.iloc[0].y,vertex.iloc[0].z])
+    # vertex = data[ (data.Track1 == 1) & (data.Track2 == 1)]
+    # vertex = np.array([vertex.iloc[0].x,vertex.iloc[0].y,vertex.iloc[0].z])
+    vertex = np.array([0,0,0])
 
-    Track1 = data[ (data.Track1 == 1) & (data.Track2 != 1)]
-    Track1 = Track1.reindex(track1_indices)
+    # Track1 = data[ (data.Track1 == 1) & (data.Track2 != 1)]
+    # Track1 = Track1.reindex(track1_indices)
+    Track1 = data.iloc[trk1_path]
     Track1 = Track1.iloc[1:] # remove vertex index
 
-    Track2 = data[ (data.Track2 == 1) & (data.Track1 != 1)]
-    Track2 = Track2.reindex(track2_indices)
+    # Track2 = data[ (data.Track2 == 1) & (data.Track1 != 1)]
+    # Track2 = Track2.reindex(track2_indices)
+    Track2 = data.iloc[trk2_path]
     Track2 = Track2.iloc[1:] # remove vertex index
 
     Reco_cos_theta, direction_vector1, direction_vector2 = CalcTrackAngle(Track1, Track2, vertex)
