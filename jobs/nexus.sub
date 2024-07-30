@@ -4,12 +4,12 @@
 jobname=nudobe
 
 # BSM Models
-#MODEL=mbb
-MODEL=Leptoquark
+MODEL=mbb
+#MODEL=Leptoquark
 
 # Nuclear Matrix Elements
-# NME=SM
-NME=IBM2
+NME=SM
+#NME=IBM2
 # NME=QRPA
 
 # Pressures
