@@ -137,6 +137,9 @@ def RunReco(data, part):
 
     dist_threshold = 4*GetMeanNodeDist(Tracks, data)
 
+    # Add in any nodes without connections to the tracks as gammas and re-label other tracks as gammas
+    AddConnectionlessNodes(connection_count, Tracks, data)
+
     # ------------------------------------------------------
     # Here we break the track containing the vertex ID in two 
     for t in Tracks:
@@ -162,13 +165,17 @@ def RunReco(data, part):
 
     for idx, Track in enumerate(Tracks):
         curr_track = Track["id"]
-        # print(curr_track)
-        # print("Num new tracks:", len(UpdatedTracks))
+        print(curr_track)
+        curr_label = Track["label"]
 
-        if (Track["label"] == "vertex"):
-            # print("Skipping Vertex...")
+        if (curr_label== "vertex"):
+            print("Skipping Vertex...")
             continue
         
+        primary_track = False
+        if (curr_label == "Track1" or curr_label == "Track2"):
+            primary_track = True
+
         start_node = Track["start"]
         end_node   = Track["end"]
 
@@ -190,7 +197,7 @@ def RunReco(data, part):
 
         # apply threshold
         if (dist_start > dist_threshold and dist_end > dist_threshold):
-            # print("Failed distance requirements")
+            print("Failed distance requirements")
             continue
 
         # Initialize
@@ -198,34 +205,67 @@ def RunReco(data, part):
         end_conn_node = 0
         con_point = "start"
         curr_track_path = Track["nodes"]
+        con_track_label = ""
+        temp_dist = 0
+
+        # Get the track labels of the connecting track
+        start_con_track_label = GetTrackDictwithNode(dist_ind_start[0], Tracks)["label"]
+        end_con_track_label   = GetTrackDictwithNode(dist_ind_end[0], Tracks)["label"]
+
+        start_primary = False
+        end_primary = False
+        if ( start_con_track_label == "Track1" or start_con_track_label == "Track2"):
+            start_primary = True
+        
+        if ( end_con_track_label == "Track1" or end_con_track_label != "Track2"):
+            end_primary = True
 
         # Choose the smallest index
-        if dist_start < dist_end:
+        if ( (dist_start < dist_end or dist_ind_end[0] == vertex_index) and (primary_track and not start_primary)  ):
             closest_idx = dist_ind_start[0]
             end_conn_node = start_node
+            con_track_label = start_con_track_label
+            temp_dist = dist_start
             
         else:
             closest_idx = dist_ind_end[0]
             end_conn_node = end_node
             con_point = "end"
+            con_track_label = end_con_track_label
+            temp_dist = dist_end
 
         # Skip if we are trying to reconnect to a vertex
-        if (end_conn_node == vertex_index):
-            # print("Trying to connect to vertex, skipping...")
+        if (closest_idx == vertex_index):
+            print("Trying to connect to vertex, skipping...")
             continue
 
+        if (( con_track_label == "Track1" or con_track_label == "Track2") and primary_track ):
+            print("Trying to connect two primaries, skipping...")
+            continue
+
+        if (temp_dist > dist_threshold):
+            print("Does not satisfy distance requreiments, skipping...")
+            continue
 
         # Get the track ID where the connecting node is located
         con_track      = GetTrackwithNode(closest_idx, Tracks)
         con_track_dict = GetTrackDictwithNode(closest_idx, Tracks)
+
+        if (con_track_dict == -1):
+            print("Connecting track could not be found...")
+            continue
+
+        if (connection_count[closest_idx] == 3 or connection_count[end_conn_node] == 3):
+            print("node already has three connecitons,skipping...")
+            continue
 
         # if node-node then merge nodes and update track in Tracks
         if (closest_idx == con_track_dict["start"] or closest_idx == con_track_dict["end"]):
             
             newpath = join_tracks(curr_track_path,con_track_dict["nodes"])
             UpdateAndMergeTrack(curr_track, con_track, newpath, UpdatedTracks, data)
-            UpdateConnections(closest_idx, end_conn_node, connected_nodes, connections, connection_count)
-            print("node-node connection")
+            UpdateConnections(end_conn_node, closest_idx, connected_nodes, connections, connection_count)
+            print("node-node connection",curr_track,con_track  )
             continue
 
         # Check if the proposed connection will form a cycle
@@ -239,17 +279,14 @@ def RunReco(data, part):
                 curr_track_path.append(closest_idx)
 
             Track["nodes"] = curr_track_path
-            UpdateConnections(closest_idx, end_conn_node, connected_nodes, connections, connection_count)
+            print("Connecting: ",end_conn_node, closest_idx)
+            UpdateConnections(end_conn_node, closest_idx, connected_nodes, connections, connection_count)
         else:
-            break
+            continue
 
-        # Combine the tracks
-        AddConnectedTracksnoDelta(curr_track, con_track, Track["nodes"], UpdatedTracks, data)
-
-
-
-    # Add in any nodes without connections to the tracks as gammas and re-label other tracks as gammas
-    AddConnectionlessNodes(connection_count, UpdatedTracks, data)
+        # Combine the track labels
+        AddConnectedTracksnoDelta(curr_track, con_track, UpdatedTracks)
+    
     FixTrackEnergies(UpdatedTracks,vertex_index, data)
 
 
@@ -412,7 +449,7 @@ for event_num in parts.event_id.unique():
 
     # In the case of nexus, set the vertex to origin
     if ("nexus" in model):
-        vertex = pd.DataFrame({'event_id': event_num, 'x': 0, 'y': 0, 'z': 0, 'energy': 0})
+        vertex = pd.DataFrame({'event_id': [event_num], 'x': [0], 'y': [0], 'z': [0], 'energy': [0]})
         hit = pd.concat([hit, vertex], ignore_index=True)
 
     # print(hit)

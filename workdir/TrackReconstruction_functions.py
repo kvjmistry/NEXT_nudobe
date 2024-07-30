@@ -230,7 +230,7 @@ def GetMeanNodeDist(Tracks, data):
             distance = calculate_distance(point1, point2)
             nodedists.append(distance)
 
-    return round(np.mean(nodedists), 3)
+    return round(np.median(nodedists), 3)
 
 
 def GetTrackwithNode(closest_idx, Tracks_):
@@ -261,7 +261,7 @@ def join_tracks(array1, array2):
         array1_reversed = array1[::-1]
         joined_array = array1_reversed + array2[1:]
     else:
-        print("Error cannot join arrays")
+        print("Error cannot join arrays", array1, array2)
         joined_array = array1 + array2  # If they can't be joined, just concatenate them
 
     return joined_array
@@ -295,33 +295,31 @@ def AddConnectedTracks(curr_track,conn_track, delta_path, seg1_path, seg2_path, 
     UpdatedTracks.append(Primary)
 
 # This adds the same track ID for the delta and the joining track
-def AddConnectedTracksnoDelta(curr_track,conn_track, track1_path, UpdatedTracks, data):
+def AddConnectedTracksnoDelta(curr_track, conn_track, UpdatedTracks):
 
-    # print("Joining tracks ",curr_track,", ",conn_track)
-    name = ""
+    print("Joining tracks ",curr_track,", ",conn_track)
+    name = "track"
     color = "red"
+    track_i_update = -1
 
-    # Remove the old tracks from the array
     for index, t in enumerate(UpdatedTracks):
         
         # remove the old tracks
         if (t["id"] == curr_track):
-            if (t["label"] == "Track1" or t["label"] == "Track2"):
-                 name = t["label"]
-                 color = t["c"]
-            UpdatedTracks.pop(index)
+            name = t["label"]
+            color = t["c"]
+            track_i_update = index
 
-    # Remove the old tracks from the array
+    # If the connecting track is a main track, then use the colour and label here
     for index, t in enumerate(UpdatedTracks):
-        # Get the same colour as the track
         if (t["id"] == conn_track):
             if (t["label"] == "Track1" or t["label"] == "Track2"):
                 name = t["label"]
                 color = t["c"]
 
-    track1_len, track1_e = GetTrackLengthEnergy(track1_path, data)
-    Track1 = {"id":conn_track, "start":track1_path[0], "end":track1_path[-1], "nodes":track1_path, "length":track1_len, "energy":track1_e,"label":name,"c":color}
-    UpdatedTracks.append(Track1)
+    UpdatedTracks[track_i_update]["label"] = name
+    UpdatedTracks[track_i_update]["c"] = color
+
 
 # From the track containing the vertex, split the track and add a single node for the vertex
 def CreateVertexandSplit(vertexid, trackid, track1_path, track2_path, Tracks, data):
