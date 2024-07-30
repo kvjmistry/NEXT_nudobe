@@ -23,6 +23,9 @@
 /nexus/random_seed 12
 /nexus/persistency/start_id 12
 
+/Actions/DefaultEventAction/min_energy 2.43 MeV
+/Actions/DefaultEventAction/max_energy 2.6 MeV
+
 # PERSISTENCY
 #/nexus/persistency/eventType background
 /nexus/persistency/output_file ATPC_BSM

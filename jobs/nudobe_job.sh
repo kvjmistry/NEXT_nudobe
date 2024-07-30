@@ -13,6 +13,12 @@ echo "JOBID $1 running on `whoami`@`hostname`"
 MODEL=$3
 echo "Model name is: ${MODEL}"
 
+NME=$4
+echo "NME is: ${NME}"
+
+PRESS=$5
+echo "Pressure is: ${PRESS}"
+
 start=`date +%s`
 
 # Setup nexus
@@ -41,7 +47,8 @@ echo "The seed number is: ${SEED}"
 sed -i "s#.*random_seed.*#/nexus/random_seed ${SEED}#" ${CONFIG}
 sed -i "s#.*start_id.*#/nexus/persistency/start_id ${SEED}#" ${CONFIG}
 sed -i "s#.*output_file.*#/nexus/persistency/output_file ${MODEL}_${JOBID}#" ${CONFIG}
-sed -i "s#.*dist_file.*#/Generator/ElecPair/dist_file ${MODEL}.txt#" ${CONFIG}
+sed -i "s#.*dist_file.*#/Generator/ElecPair/dist_file ${MODEL}_${NME}.txt#" ${CONFIG}
+sed -i "s#.*gas_pressure.*#/Geometry/ATPC/gas_pressure ${PRESS} bar#" ${CONFIG}
 
 # Print out the config and init files
 cat ${INIT}
