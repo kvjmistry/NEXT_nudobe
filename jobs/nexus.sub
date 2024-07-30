@@ -43,7 +43,7 @@ output = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewPro
 transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/scripts/SmearEventsGeneral.py,$(HOME_LOCATION)/scripts/CompressEvents.py,$(HOME_LOCATION)/files/$(MODEL)_$(NME).txt
 
 # Transfer output files
-transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).tar"
+transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).tar"
 
 # Specify Job duration category as "Medium" (expected runtime <10 hr) or "Long" (expected runtime <20 hr). 
 +JobDurationCategory = "Medium"
