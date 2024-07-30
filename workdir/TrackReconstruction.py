@@ -444,8 +444,8 @@ counter = 0
 
 for event_num in parts.event_id.unique():
 
-    if (counter > 30):
-        break
+    # if (counter > 30):
+    #     break
 
     hit = hits[hits.event_id == event_num]
     part = parts[parts.event_id == event_num]
