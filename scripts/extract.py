@@ -14,11 +14,11 @@ def extract_files(tar_path, path, model, nme):
 
     # Define the dynamic folder mapping based on the tar file's id
     folder_mapping = {
-        f'{model}_{nme}_{file_id}.h5': 'nexus',
-        f'{model}_{nme}_{file_id}_1mm_smear.h5' :  '1mm',
-        f'{model}_{nme}_{file_id}_2mm_smear.h5' :  '2mm',
-        f'{model}_{nme}_{file_id}_4mm_smear.h5' :  '4mm',
-        f'{model}_{nme}_{file_id}_10mm_smear.h5': '10mm'
+        f'{model}_{file_id}.h5': 'nexus',
+        f'{model}_{file_id}_1mm_smear.h5' :  '1mm',
+        f'{model}_{file_id}_2mm_smear.h5' :  '2mm',
+        f'{model}_{file_id}_4mm_smear.h5' :  '4mm',
+        f'{model}_{file_id}_10mm_smear.h5': '10mm'
     }
 
     with tarfile.open(tar_path, 'r:*') as tar:
