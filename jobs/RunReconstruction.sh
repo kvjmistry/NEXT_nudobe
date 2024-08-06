@@ -11,8 +11,17 @@ start=`date +%s`
 echo "The JOBID is ${SLURM_ARRAY_TASK_ID}" 
  
 # Set the configurable variables
-# Model_NME_binning
-JOBNAME="Leptoquark_SM"
+MODEL="mbb"
+#MODEL="Leptoquark"
+
+NME="SM"
+#NME="QRPA"
+#NME="IBM2"
+
+PRESSURE=1bar
+#PRESSURE=5bar
+#PRESSURE=10bar
+#PRESSURE=15bar
 
 BINNING="1mm_smear"
 #BINNING="2mm_smear"
@@ -20,10 +29,11 @@ BINNING="1mm_smear"
 #BINNING="10mm_smear"
 #BINNING="nexus"
 
-H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_${BINNING}.h5"
-EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files/${JOBNAME}_events.txt
+H5FILE="/home/argon/Projects/Krishan/NEXT_nudobe/files/${MODEL}/${NME}/${PRESSURE}/${MODEL}_${BINNING}.h5"
+EVENTFILE=/home/argon/Projects/Krishan/NEXT_nudobe/files//${MODEL}/${NME}/${PRESSURE}/${MODEL}_events.txt
 
-echo "JOBNAME is: ${JOBNAME}"
+echo "Model is: ${MODEL}"
+echo "NME is: ${NME}"
 echo "BINNING is: ${BINNING}"
 echo "H5File is: ${H5FILE}"
 echo "EVENTFILE is: ${EVENTFILE}"
@@ -33,14 +43,14 @@ echo "EVENTFILE is: ${EVENTFILE}"
 N=100 # The number of segments to run -- 1-103 slurm
 
 # Create the directory
-mkdir -p "${JOBNAME}_${BINNING}"
-cd "${JOBNAME}_${BINNING}"
+mkdir -p "${MODEL}_${NME}_${PRESSURE}_${BINNING}"
+cd "${MODEL}_${NME}_${PRESSURE}_${BINNING}"
 
 # Setup VENV so we have python
 echo "Setting Up Python" 
 source /home/argon/Projects/Krishan/venv/bin/activate
 
-cp /home/argon/Projects/Krishan/NEXT_nudobe/workdir/TrackReconstruction_functions.py .
+cp /home/argon/Projects/Krishan/NEXT_nudobe/workdir/TrackReconstruction_functions.py ./TrackReconstruction_functions_${SLURM_ARRAY_TASK_ID}.py
 
 # Get the total number of lines in the file
 total_lines=$(wc -l < ${EVENTFILE})
@@ -61,10 +71,11 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${SLURM_ARRAY_TASK_ID
 
 # Run the reco
 echo "Running Reco" 
-# python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
-python3 /home/argon/Projects/Krishan/NEXT_nudobe/workdir/TrackReconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${JOBNAME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
+# python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
+python3 TrackReconstruction_functions_${SLURM_ARRAY_TASK_ID}.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${PRESSURE}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
 
 rm segment_${SLURM_ARRAY_TASK_ID}.txt
+rm TrackReconstruction_functions_${SLURM_ARRAY_TASK_ID}.py
 ls -ltrh
 
 echo; echo; echo;
