@@ -75,7 +75,6 @@ echo "Running Reco"
 python3 TrackReconstruction_functions.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${PRESSURE}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
 
 rm segment_${SLURM_ARRAY_TASK_ID}.txt
-rm TrackReconstruction_functions.py
 ls -ltrh
 
 echo; echo; echo;
