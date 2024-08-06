@@ -72,7 +72,7 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${SLURM_ARRAY_TASK_ID
 # Run the reco
 echo "Running Reco" 
 # python3 /home/argon/Projects/Krishan/NEXT_nudobe/scripts/kinematics_reconstruction.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
-python3 TrackReconstruction_functions_${SLURM_ARRAY_TASK_ID}.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${PRESSURE}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
+python3 TrackReconstruction_functions.py ${H5FILE} "segment_${SLURM_ARRAY_TASK_ID}.txt" "${MODEL}_${NME}_${PRESSURE}_${BINNING}_${SLURM_ARRAY_TASK_ID}"  
 
 rm segment_${SLURM_ARRAY_TASK_ID}.txt
 rm TrackReconstruction_functions.py
