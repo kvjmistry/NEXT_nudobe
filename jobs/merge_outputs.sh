@@ -4,8 +4,18 @@ NM="SM"
 PRESSURE="1bar"
 mkdir -p merged
 
-for f in $(ls ${Model}_${NME}_${PRESSURE}_nexus); do echo "" > merged/${Model}_${NME}_${PRESSURE}_nexus_reco_merged.txt;cat ${Model}_${NME}_${PRESSURE}_nexus/$f >> merged/${Model}_${NME}_${PRESSURE}_nexus_reco_merged.txt;done
-for f in $(ls ${Model}_${NME}_${PRESSURE}_1mm_smear); do echo "" > merged/${Model}_${NME}_${PRESSURE}_1mm_smear_reco_merged.txt;cat ${Model}_${NME}_${PRESSURE}_1mm_smear/$f >> merged/${Model}_${NME}_${PRESSURE}_1mm_smear_reco_merged.txt;done
-for f in $(ls ${Model}_${NME}_${PRESSURE}_2mm_smear); do echo "" > merged/${Model}_${NME}_${PRESSURE}_2mm_smear_reco_merged.txt;cat ${Model}_${NME}_${PRESSURE}_2mm_smear/$f >> merged/${Model}_${NME}_${PRESSURE}_2mm_smear_reco_merged.txt;done
-for f in $(ls ${Model}_${NME}_${PRESSURE}_4mm_smear); do echo "" > merged/${Model}_${NME}_${PRESSURE}_4mm_smear_reco_merged.txt;cat ${Model}_${NME}_${PRESSURE}_4mm_smear/$f >> merged/${Model}_${NME}_${PRESSURE}_4mm_smear_reco_merged.txt;done
-for f in $(ls ${Model}_${NME}_${PRESSURE}_10mm_smear); do echo "" > merged/${Model}_${NME}_${PRESSURE}_10mm_smear_reco_merged.txt;cat ${Model}_${NME}_${PRESSURE}_10mm_smear/$f >> merged/${Model}_${NME}_${PRESSURE}_10mm_smear_reco_merged.txt;done
+# Define the smear values
+smear_values=("1mm_smear" "2mm_smear" "4mm_smear" "10mm_smear")
+
+# Loop over the smear values
+for smear in "${smear_values[@]}"; do
+
+    # Initialize the merged file
+    echo "" > merged/${Model}_${NME}_${PRESSURE}_${smear}_reco_merged.txt
+
+    # Loop over files in the current smear directory
+    for f in $(ls ${Model}_${NME}_${PRESSURE}_${smear}); do
+        # Append the contents of each file to the merged file
+        cat ${Model}_${NME}_${PRESSURE}_${smear}/$f >> merged/${Model}_${NME}_${PRESSURE}_${smear}_reco_merged.txt
+    done
+done
