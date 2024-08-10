@@ -297,18 +297,24 @@ def AddConnectedTracks(curr_track,conn_track, delta_path, seg1_path, seg2_path, 
 # This adds the same track ID for the delta and the joining track
 def AddConnectedTracksnoDelta(curr_track, conn_track, UpdatedTracks):
 
-    print("Joining tracks ",curr_track,", ",conn_track)
+    print("Joining Delta tracks ",curr_track,", ",conn_track)
     name = "track"
-    color = "red"
-    track_i_update = -1
+    color = "DarkBlue"
+    track_i_curr_update = -1
+    track_i_con_update = -1
+
+    found = False
 
     for index, t in enumerate(UpdatedTracks):
         
         # remove the old tracks
         if (t["id"] == curr_track):
-            name = t["label"]
-            color = t["c"]
-            track_i_update = index
+            
+            if (t["label"] == "Track1" or t["label"] == "Track2"):
+                name = t["label"]
+                color = t["c"]
+                found= True
+            track_i_curr_update = index
 
     # If the connecting track is a main track, then use the colour and label here
     for index, t in enumerate(UpdatedTracks):
@@ -316,9 +322,17 @@ def AddConnectedTracksnoDelta(curr_track, conn_track, UpdatedTracks):
             if (t["label"] == "Track1" or t["label"] == "Track2"):
                 name = t["label"]
                 color = t["c"]
+                found= True
+            track_i_con_update = index
 
-    UpdatedTracks[track_i_update]["label"] = name
-    UpdatedTracks[track_i_update]["c"] = color
+    if (not found):
+        print("error primary track not found,...")
+
+    UpdatedTracks[track_i_curr_update]["label"] = name
+    UpdatedTracks[track_i_curr_update]["c"] = color
+
+    UpdatedTracks[track_i_con_update]["label"] = name
+    UpdatedTracks[track_i_con_update]["c"] = color
 
 
 # From the track containing the vertex, split the track and add a single node for the vertex
@@ -350,7 +364,7 @@ def CreateVertexandSplit(vertexid, trackid, track1_path, track2_path, Tracks, da
 # Update an existing track in the updated tracks array from the merging of two tracks
 def UpdateAndMergeTrack(curr_track,conn_track, newpath, UpdatedTracks_, data):
 
-    name=""
+    name="track"
     
     for index, t in enumerate(UpdatedTracks_):
         
@@ -359,18 +373,22 @@ def UpdateAndMergeTrack(curr_track,conn_track, newpath, UpdatedTracks_, data):
             
             # remove the old tracks
             if (t["id"] == curr_track):
+                if (t["label"] == "Track1" or t["label"] == "Track2"):
+                    name = t["label"]
                 UpdatedTracks_.pop(index)
 
         # Remove the old tracks from the array
         for index, t in enumerate(UpdatedTracks_):
             # remove the old tracks
             if (t["id"] == conn_track):
-                name=t["label"]
+                if (t["label"] == "Track1" or t["label"] == "Track2"):
+                    name = t["label"]
                 UpdatedTracks_.pop(index)
 
     # Add the new merged track
     length, energy = GetTrackLengthEnergy(newpath, data)
     print(newpath[0], newpath[-1], newpath)
+    print("New Name is:", name)
     color = next(color_cycle)
     Primary = {"id":GetUniqueTrackID(UpdatedTracks_), "start":newpath[0], "end":newpath[-1], "nodes":newpath, "length":length, "energy":energy,"label":name,"c":color}
     UpdatedTracks_.append(Primary)
@@ -498,3 +516,40 @@ def CalcTrackAngle(Track1, Track2, vertex):
 
 
     return cosine, dir_track1, dir_track2
+
+
+# Function will nodes belonging to the other primary track and vertex
+def FilterNodes(dist_ind_start, dist_ind_end, curr_track_label, UpdatedTracks_):
+
+    filter_arr = []
+    for t in UpdatedTracks_:
+
+        # Only remove the vertex if the label is track
+        if (curr_track_label == "track"):
+            if (t["label"] == "vertex"):
+                filter_arr = filter_arr + t["nodes"]
+        # Remove other labels that are tracks
+        else:
+            if (t["label"] == "Track1" or t["label"] == "Track2" or t["label"] == "vertex"):
+                
+                # permit a connection if both are labeled the same
+                if (t["label"] != curr_track_label):
+                    filter_arr = filter_arr + t["nodes"]
+
+    dist_ind_start = [x for x in dist_ind_start if x not in filter_arr]
+    dist_ind_end = [x for x in dist_ind_end if x not in filter_arr]
+
+    return dist_ind_start, dist_ind_end
+
+# Function to add the connected node to the track
+def UpdateTrackEnd(con_point, curr_track, closest_idx, UpdatedTracks_):
+    for index,t in enumerate(UpdatedTracks_):
+        if (t["id"] == curr_track):
+            if (con_point == "end"):
+                UpdatedTracks_[index]["nodes"].append(closest_idx)
+                UpdatedTracks_[index]["end"] = closest_idx
+            else:
+                UpdatedTracks_[index]["nodes"].insert(0, closest_idx)
+                UpdatedTracks_[index]["start"] = closest_idx
+
+    return UpdatedTracks_[index]

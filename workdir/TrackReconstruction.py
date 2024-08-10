@@ -172,10 +172,6 @@ def RunReco(data, part):
             print("Skipping Vertex...")
             continue
         
-        primary_track = False
-        if (curr_label == "Track1" or curr_label == "Track2"):
-            primary_track = True
-
         start_node = Track["start"]
         end_node   = Track["end"]
 
@@ -191,6 +187,13 @@ def RunReco(data, part):
         dist_ind_start = [x for x in dist_ind_start if x not in Track["nodes"]]
         dist_ind_end   = [x for x in dist_ind_end if x not in Track["nodes"]]
 
+        # if we have a primary track, then filter the vertex node and the other primary track nodes
+        dist_ind_start, dist_ind_end = FilterNodes(dist_ind_start, dist_ind_end, curr_label, UpdatedTracks)
+
+        # After filtering, if no candidate nodes left, then continue
+        if (len(dist_ind_start) == 0):
+            continue
+
         # Distances of the end point to the closest track
         dist_start = dist_matrix[start_node][dist_ind_start[0]]
         dist_end   = dist_matrix[end_node][dist_ind_end[0]]
@@ -205,67 +208,34 @@ def RunReco(data, part):
         end_conn_node = 0
         con_point = "start"
         curr_track_path = Track["nodes"]
-        con_track_label = ""
-        temp_dist = 0
 
         # Get the track labels of the connecting track
         start_con_track_label = GetTrackDictwithNode(dist_ind_start[0], Tracks)["label"]
         end_con_track_label   = GetTrackDictwithNode(dist_ind_end[0], Tracks)["label"]
 
-        start_primary = False
-        end_primary = False
-        if ( start_con_track_label == "Track1" or start_con_track_label == "Track2"):
-            start_primary = True
-        
-        if ( end_con_track_label == "Track1" or end_con_track_label != "Track2"):
-            end_primary = True
-
         # Choose the smallest index
-        if ( (dist_start < dist_end or dist_ind_end[0] == vertex_index) and (primary_track and not start_primary)  ):
+        if ( (dist_start < dist_end or dist_ind_end[0] == vertex_index)):
             closest_idx = dist_ind_start[0]
             end_conn_node = start_node
-            con_track_label = start_con_track_label
-            temp_dist = dist_start
-            
+
         else:
             closest_idx = dist_ind_end[0]
             end_conn_node = end_node
             con_point = "end"
-            con_track_label = end_con_track_label
-            temp_dist = dist_end
-
-        # Skip if we are trying to reconnect to a vertex
-        if (closest_idx == vertex_index):
-            print("Trying to connect to vertex, skipping...")
-            continue
-
-        if (( con_track_label == "Track1" or con_track_label == "Track2") and primary_track ):
-            print("Trying to connect two primaries, skipping...")
-            continue
-
-        if (temp_dist > dist_threshold):
-            print("Does not satisfy distance requreiments, skipping...")
-            continue
 
         # Get the track ID where the connecting node is located
         con_track      = GetTrackwithNode(closest_idx, Tracks)
         con_track_dict = GetTrackDictwithNode(closest_idx, Tracks)
+        print("Connecting Track ID is:",con_track_dict["id"])
 
         if (con_track_dict == -1):
             print("Connecting track could not be found...")
             continue
 
-        if (connection_count[closest_idx] == 3 or connection_count[end_conn_node] == 3):
+        # The current node should not have more than 2 connections as its an end
+        # The connecting node should not have more than 3 connections
+        if (connection_count[closest_idx] >= 3 or connection_count[end_conn_node] >= 2):
             print("node already has three connecitons,skipping...")
-            continue
-
-        # if node-node then merge nodes and update track in Tracks
-        if (closest_idx == con_track_dict["start"] or closest_idx == con_track_dict["end"]):
-            
-            newpath = join_tracks(curr_track_path,con_track_dict["nodes"])
-            UpdateAndMergeTrack(curr_track, con_track, newpath, UpdatedTracks, data)
-            UpdateConnections(end_conn_node, closest_idx, connected_nodes, connections, connection_count)
-            print("node-node connection",curr_track,con_track  )
             continue
 
         # Check if the proposed connection will form a cycle
@@ -283,6 +253,8 @@ def RunReco(data, part):
             UpdateConnections(end_conn_node, closest_idx, connected_nodes, connections, connection_count)
         else:
             continue
+
+        Track = UpdateTrackEnd(con_point, curr_track, closest_idx, UpdatedTracks)
 
         # Combine the track labels
         AddConnectedTracksnoDelta(curr_track, con_track, UpdatedTracks)
@@ -406,12 +378,12 @@ def RunReco(data, part):
     Track2 = data.iloc[trk2_path]
     Track2 = Track2.iloc[1:] # remove vertex index
 
-    Reco_cos_theta, direction_vector1, direction_vector2 = CalcTrackAngle(Track1, Track2, vertex)
+    Reco_cos_theta, dir1, dir2 = CalcTrackAngle(Track1, Track2, vertex)
 
     # # Compute cosine of the angle between the vectors
     # Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
 
-    return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks
+    return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, dir1, dir2, connected_nodes, UpdatedTracks
 
 
 # USAGE: python TrackReconstruction.py <infile> <eventfile> <model>
@@ -439,6 +411,7 @@ costheta_gen_arr  = []
 T1_reco_arr       = []
 costheta_reco_arr = []
 e_gammas_arr      = []
+nodedist_arr      = []
 
 counter = 0
 
@@ -457,7 +430,7 @@ for event_num in parts.event_id.unique():
 
     # print(hit)
 
-    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, connected_nodes, UpdatedTracks = RunReco(hit, part)
+    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, dir1, dir2, connected_nodes, UpdatedTracks = RunReco(hit, part)
 
     print("Event: ",event_num)
     print("Gen  T1:",Gen_T1)
@@ -465,6 +438,11 @@ for event_num in parts.event_id.unique():
 
     print("Gen  Cos Theta:",Gen_cos_theta)
     print("Reco Cos Theta:", Reco_cos_theta)
+
+    dir1_size =  np.linalg.norm(dir1)
+    dir2_size =  np.linalg.norm(dir2)
+    MeanNodeDist = (dir1_size+dir2_size)/2 # Mean distance of nodes to compute the angular reconstruction
+    print("MeanNodeDist:", MeanNodeDist)
     print("")
 
     event_id_arr.append(event_num)
@@ -473,6 +451,7 @@ for event_num in parts.event_id.unique():
     T1_reco_arr.append(Reco_T1)
     costheta_reco_arr.append(Reco_cos_theta)
     e_gammas_arr.append(e_gammas)
+    nodedist_arr.append(MeanNodeDist)
 
     counter = counter+1
 
@@ -482,7 +461,8 @@ mydict_reco = {'event_id':event_id_arr,
            'costheta_gen':costheta_gen_arr,
            'T1_reco':T1_reco_arr,
            'costheta_reco':costheta_reco_arr,
-           'e_gammas_reco':e_gammas_arr}
+           'e_gammas_reco':e_gammas_arr,
+           'nodedist_reco':nodedist_arr}
     
 
 df_reco = pd.DataFrame(mydict_reco) 

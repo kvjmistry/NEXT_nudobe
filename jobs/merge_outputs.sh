@@ -1,6 +1,6 @@
 #!/bin/bash 
 Model="mbb"
-NM="SM"
+NME="SM"
 PRESSURE="1bar"
 mkdir -p merged
 
