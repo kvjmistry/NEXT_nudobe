@@ -40,7 +40,7 @@ echo "EVENTFILE is: ${EVENTFILE}"
 
 
 # Set the configurable variables
-N=100 # The number of segments to run -- 1-103 slurm
+N=200 # The number of segments to run -- 1-201 slurm
 
 # Create the directory
 mkdir -p "${MODEL}_${NME}_${PRESSURE}_${BINNING}"

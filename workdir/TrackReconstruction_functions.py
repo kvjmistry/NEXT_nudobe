@@ -297,7 +297,7 @@ def AddConnectedTracks(curr_track,conn_track, delta_path, seg1_path, seg2_path, 
 # This adds the same track ID for the delta and the joining track
 def AddConnectedTracksnoDelta(curr_track, conn_track, UpdatedTracks):
 
-    print("Joining Delta tracks ",curr_track,", ",conn_track)
+    # print("Joining Delta tracks ",curr_track,", ",conn_track)
     name = "track"
     color = "DarkBlue"
     track_i_curr_update = -1

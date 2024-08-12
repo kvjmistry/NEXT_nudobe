@@ -169,7 +169,7 @@ def RunReco(data, part):
         curr_label = Track["label"]
 
         if (curr_label== "vertex"):
-            print("Skipping Vertex...")
+            # print("Skipping Vertex...")
             continue
         
         start_node = Track["start"]
@@ -200,7 +200,7 @@ def RunReco(data, part):
 
         # apply threshold
         if (dist_start > dist_threshold and dist_end > dist_threshold):
-            print("Failed distance requirements")
+            # print("Failed distance requirements")
             continue
 
         # Initialize
@@ -229,13 +229,13 @@ def RunReco(data, part):
         print("Connecting Track ID is:",con_track_dict["id"])
 
         if (con_track_dict == -1):
-            print("Connecting track could not be found...")
+            # print("Connecting track could not be found...")
             continue
 
         # The current node should not have more than 2 connections as its an end
         # The connecting node should not have more than 3 connections
         if (connection_count[closest_idx] >= 3 or connection_count[end_conn_node] >= 2):
-            print("node already has three connecitons,skipping...")
+            # print("node already has three connecitons,skipping...")
             continue
 
         # Check if the proposed connection will form a cycle
@@ -249,7 +249,7 @@ def RunReco(data, part):
                 curr_track_path.append(closest_idx)
 
             Track["nodes"] = curr_track_path
-            print("Connecting: ",end_conn_node, closest_idx)
+            # print("Connecting: ",end_conn_node, closest_idx)
             UpdateConnections(end_conn_node, closest_idx, connected_nodes, connections, connection_count)
         else:
             continue
@@ -279,7 +279,7 @@ def RunReco(data, part):
 
     # Reconstruction level quantities
 
-    # Add gamma energy to the lowest energy track
+    # Add gamma energy to the closest track
 
     track1_energy = 0
     track2_energy = 0
@@ -300,27 +300,41 @@ def RunReco(data, part):
     # If there is no Track1 or Track2 then return failed reco value
     if (track1 == 0 or track2 == 0):
         print("Error!! No track1 or track 2 in final reconstruction...")
-        return -9, -9, -9, -9, -9, connected_nodes, UpdatedTracks
+        return -999, -999, -999, -999, -999, connected_nodes, UpdatedTracks
 
-    # ID the track with the lowest label
-    highest_track = "Track2"
-    if (track1_energy > track2_energy):
-        highest_track = "Track1"
-
-
-    e_gammas = 0
+    # This adds each gamma/track energy to the closest track
     for t in UpdatedTracks:
 
-        if (t["label"] != "Track1" and t["label"] != "Track2"):
-            # print(t["label"])
-            e_gammas = e_gammas + t["energy"]
+        if (t["label"] != "Track1" and t["label"] != "Track2" and t["label"] != "vertex"):
 
-    print("Gamma Energy:",e_gammas)
+            print(t["label"])
+            # Get the indexes of closest nodes to start of the gamma
+            dist_ind_start = np.argsort(dist_matrix[t["start"]])[1:]
 
-    if (highest_track == "Track1"):
-        track1_energy = track1_energy + e_gammas
-    else:
-        track2_energy = track2_energy + e_gammas
+            # Filter nodes that are in the current track
+            dist_ind_start = [x for x in dist_ind_start if x not in t["nodes"]]
+
+            found_Track = False
+
+            # Loop over the the closest indexes
+            for d_idx in dist_ind_start:
+
+                if (found_Track):
+                    break
+
+                # Loop over the tracks
+                for closest_t in UpdatedTracks:
+                    if (d_idx in closest_t["nodes"] and closest_t["label"] == "Track1"):
+                        # print("Adding Gamma energy", t["energy"] ,"to Track1")
+                        track1_energy = track1_energy + t["energy"]
+                        found_Track = True
+                        break
+
+                    if (d_idx in closest_t["nodes"] and closest_t["label"] == "Track2"):
+                        # print("Adding Gamma energy", t["energy"] ,"to Track2")
+                        track2_energy = track2_energy + t["energy"]
+                        found_Track = True
+                        break
 
     print("Track 1 Energy:", track1_energy)
     print("Track 2 Energy:", track2_energy)
@@ -364,26 +378,18 @@ def RunReco(data, part):
 
 
     # Given vertex position
-    # vertex = data[ (data.Track1 == 1) & (data.Track2 == 1)]
-    # vertex = np.array([vertex.iloc[0].x,vertex.iloc[0].y,vertex.iloc[0].z])
     vertex = np.array([0,0,0])
 
-    # Track1 = data[ (data.Track1 == 1) & (data.Track2 != 1)]
-    # Track1 = Track1.reindex(track1_indices)
     Track1 = data.iloc[trk1_path]
     Track1 = Track1.iloc[1:] # remove vertex index
 
-    # Track2 = data[ (data.Track2 == 1) & (data.Track1 != 1)]
-    # Track2 = Track2.reindex(track2_indices)
     Track2 = data.iloc[trk2_path]
     Track2 = Track2.iloc[1:] # remove vertex index
 
     Reco_cos_theta, dir1, dir2 = CalcTrackAngle(Track1, Track2, vertex)
 
-    # # Compute cosine of the angle between the vectors
-    # Reco_cos_theta = cosine_angle(direction_vector1, direction_vector2)
 
-    return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, dir1, dir2, connected_nodes, UpdatedTracks
+    return Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, dir1, dir2, connected_nodes, UpdatedTracks
 
 
 # USAGE: python TrackReconstruction.py <infile> <eventfile> <model>
@@ -410,7 +416,6 @@ T1_gen_arr        = []
 costheta_gen_arr  = []
 T1_reco_arr       = []
 costheta_reco_arr = []
-e_gammas_arr      = []
 nodedist_arr      = []
 
 counter = 0
@@ -430,7 +435,7 @@ for event_num in parts.event_id.unique():
 
     # print(hit)
 
-    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, e_gammas, dir1, dir2, connected_nodes, UpdatedTracks = RunReco(hit, part)
+    Gen_T1, Gen_cos_theta, Reco_T1, Reco_cos_theta, dir1, dir2, connected_nodes, UpdatedTracks = RunReco(hit, part)
 
     print("Event: ",event_num)
     print("Gen  T1:",Gen_T1)
@@ -450,7 +455,6 @@ for event_num in parts.event_id.unique():
     costheta_gen_arr.append(Gen_cos_theta)
     T1_reco_arr.append(Reco_T1)
     costheta_reco_arr.append(Reco_cos_theta)
-    e_gammas_arr.append(e_gammas)
     nodedist_arr.append(MeanNodeDist)
 
     counter = counter+1
@@ -461,7 +465,6 @@ mydict_reco = {'event_id':event_id_arr,
            'costheta_gen':costheta_gen_arr,
            'T1_reco':T1_reco_arr,
            'costheta_reco':costheta_reco_arr,
-           'e_gammas_reco':e_gammas_arr,
            'nodedist_reco':nodedist_arr}
     
 
