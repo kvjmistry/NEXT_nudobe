@@ -28,8 +28,8 @@ echo "Segement Size is: ${N_JOBS}"
 
 start=`date +%s`
 
-H5FILE="${MODEL}/${NME}/${PRESSURE}/${MODEL}_${BINNING}.h5"
-EVENTFILE=${MODEL}/${NME}/${PRESSURE}/${MODEL}_events.txt
+H5FILE=${MODEL}_${BINNING}.h5
+EVENTFILE=${MODEL}_events.txt
 
 echo "Model is: ${MODEL}"
 echo "NME is: ${NME}"
