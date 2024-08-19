@@ -12,7 +12,7 @@ MODEL=mbb
 NME=IBM2
 # NME=QRPA
 
-# Pressures
+# PRESSs
 PRESS=1
 # PRESS=3
 # PRESS=5
@@ -45,10 +45,10 @@ error  = logs/$(MODEL)/$(NME)/$(PRESS)bar/trackreco/$(BINNING)/jobid$(NewProcess
 output = logs/$(MODEL)/$(NME)/$(PRESS)bar/trackreco/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
 
 # Transfer input files
-transfer_input_files = $(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESSURE)/$(MODEL)_$(BINNING).h5,$(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESSURE)/$(MODEL)_events.txt,$(HOME_LOCATION)/workdir/TrackReconstruction_functions.py,$(HOME_LOCATION)/workdir/TrackReconstruction.py
+transfer_input_files = $(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_$(BINNING).h5,$(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_events.txt,$(HOME_LOCATION)/workdir/TrackReconstruction_functions.py,$(HOME_LOCATION)/workdir/TrackReconstruction.py
 
 # Transfer output files
-transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESSURE)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/reco/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).txt"
+transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/reco/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).txt"
 
 # Specify Job duration category as "Medium" (expected runtime <10 hr) or "Long" (expected runtime <20 hr). 
 +JobDurationCategory = "Medium"
