@@ -20,11 +20,11 @@ PRESS=1
 # PRESS=10
 # PRESS=15
 
-BINNING="1mm_smear"
-#BINNING="2mm_smear"
-#BINNING="4mm_smear"
-#BINNING="10mm_smear"
-#BINNING="nexus"
+BINNING=1mm_smear
+#BINNING=2mm_smear
+#BINNING=4mm_smear
+#BINNING=10mm_smear
+#BINNING=nexus
 
 N_JOBS=1000
 
