@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance_matrix
-import numpy as np
 import copy
 import itertools
 import matplotlib.pyplot as plt

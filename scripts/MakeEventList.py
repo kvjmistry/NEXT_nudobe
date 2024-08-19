@@ -2,7 +2,7 @@ import pandas as pd
 import sys
 
 # USAGE: python MakeEventList.py <infile> <outfile>
-# python MakeEventList.py "/ospool/ap40/data/krishan.mistry/job/nudobe/Leptoquark_SM/Leptoquark_SM_nexus.h5"  "Leptoquark_SM_events.txt"
+# python MakeEventList.py "/ospool/ap40/data/krishan.mistry/job/nudobe/mbb/IBM2/15bar/mbb_nexus.h5"  "/ospool/ap40/data/krishan.mistry/job/nudobe/mbb/IBM2/15bar/mbb_events.txt"
 
 infile  = sys.argv[1]
 outfile = sys.argv[2]

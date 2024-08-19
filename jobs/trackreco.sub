@@ -8,8 +8,8 @@ MODEL=mbb
 #MODEL=Leptoquark
 
 # Nuclear Matrix Elements
-NME=SM
-#NME=IBM2
+# NME=SM
+NME=IBM2
 # NME=QRPA
 
 # Pressures
@@ -20,36 +20,41 @@ PRESS=1
 # PRESS=10
 # PRESS=15
 
-CONFIG=ATPC_BSM.config.mac
-INIT=ATPC_BSM.init.mac
+BINNING="1mm_smear"
+#BINNING="2mm_smear"
+#BINNING="4mm_smear"
+#BINNING="10mm_smear"
+#BINNING="nexus"
+
+N_JOBS=1000
 
 OSDF_LOCATION=osdf:///ospool/ap40/data/krishan.mistry
-HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe/
+HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe
 
 # newjobid = $(Process) + 100
 #NewProcess = $INT(newjobid, %d)
 NewProcess = $(Process)
 
-executable = $(jobname)_job.sh
-arguments = $(NewProcess) $(jobname) $(MODEL) $(NME) $(PRESS)
+executable = RunReconstruction_condor.sh
+arguments = $(NewProcess) $(jobname) $(MODEL) $(NME) $(PRESS) $(BINNING) $(N_JOBS)
 
 # Specify the name of the log, standard error, and standard output (or "screen output") files. Wherever you see $(Cluster), HTCondor will insert the 
 #  queue number assigned to this set of jobs at the time of submission.
-log    = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewProcess).log
-error  = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewProcess).err
-output = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
+log    = logs/$(MODEL)/$(NME)/$(PRESS)bar/trackreco/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).log
+error  = logs/$(MODEL)/$(NME)/$(PRESS)bar/trackreco/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).err
+output = logs/$(MODEL)/$(NME)/$(PRESS)bar/trackreco/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
 
 # Transfer input files
-transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/scripts/SmearEventsGeneral.py,$(HOME_LOCATION)/scripts/CompressEvents.py,$(HOME_LOCATION)/files/$(MODEL)_$(NME).txt
+transfer_input_files = $(HOME_LOCATION)/$(HOME_LOCATION)/files/$(MODEL)/$(NME)/$(PRESSURE)/$(MODEL)_$(BINNING).h5,$(HOME_LOCATION)/files/$(MODEL)/$(NME)/$(PRESSURE)/$(MODEL)_events.txt,$(HOME_LOCATION)/workdir/TrackReconstruction_functions.py,$(HOME_LOCATION)/workdir/TrackReconstruction.py
 
 # Transfer output files
-transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).tar"
+transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESSURE)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/reco/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).tar"
 
 # Specify Job duration category as "Medium" (expected runtime <10 hr) or "Long" (expected runtime <20 hr). 
 +JobDurationCategory = "Medium"
 
 # Use a singularity image to submit the file. The image should be stored in the protected area of your workspace
-+SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC_nudobe2.sif"
++SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC_nudobe3.sif"
 
 
 # Tell HTCondor requirements (e.g., operating system) your job needs, 
@@ -63,4 +68,4 @@ request_disk = 5GB
 # max_idle = 2000
 
 # Tell HTCondor the number of instances to run:
-queue 400
+queue $(N_JOBS)
