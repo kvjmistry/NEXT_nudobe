@@ -66,7 +66,7 @@ echo; echo; echo;
 rm segment_${JOBID}.txt
 
 # Check for the exit file
-if [ ! -e "${MODEL}_${NME}_${PRESS}_${BINNING}_model.txt" ]; then
+if [ ! -e "${MODEL}_${NME}_${PRESS}_${BINNING}_reco.txt" ]; then
   echo "Error: File does not exist, returning with STATUS 1."
   exit 1
 fi
