@@ -67,5 +67,13 @@ request_disk = 5GB
 # If submitting more than 10k jobs use this statement
 # max_idle = 2000
 
+# Job resubmission criteria
+# Set a periodic release condition that will resubmit the job if the exit code is non-zero.
+periodic_release = (ExitBySignal == False) && (ExitCode != 0) && (NumJobStarts < 2)
+
+# Optionally, specify that the job should be removed after 3 failed attempts
+on_exit_remove = (ExitBySignal == False) && (ExitCode == 0) || (NumJobStarts >= 2)
+
+
 # Tell HTCondor the number of instances to run:
 queue $(N_JOBS)

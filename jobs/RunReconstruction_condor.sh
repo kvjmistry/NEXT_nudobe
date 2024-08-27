@@ -57,11 +57,18 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${JOBID}.txt
 
 # Run the reco
 echo "Running Reco" 
-python3 TrackReconstruction.py ${H5FILE} "segment_${JOBID}.txt" "${MODEL}_${NME}_${PRESSURE}_${BINNING}"  
+python3 TrackReconstruction.py ${H5FILE} "segment_${JOBID}.txt" "${MODEL}_${NME}_${PRESS}_${BINNING}"  
 
 ls -ltrh
 
 echo; echo; echo;
+
+# Check for the exit file
+if [ ! -e "${MODEL}_${NME}_${PRESS}_${BINNING}_model.txt" ]; then
+  echo "Error: File does not exist, returning with STATUS 1."
+  exit 1
+fi
+
 
 echo "FINISHED....EXITING" 
 
@@ -71,3 +78,4 @@ let hours=deltatime/3600
 let minutes=(deltatime/60)%60
 let seconds=deltatime%60
 printf "Time spent: %d:%02d:%02d\n" $hours $minutes $seconds 
+exit 0
