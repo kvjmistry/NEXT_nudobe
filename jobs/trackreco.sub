@@ -48,7 +48,7 @@ output = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco/$(BINNING)/jobid$(NewProcess)/$
 transfer_input_files = $(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_$(BINNING).h5,$(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_events.txt,$(HOME_LOCATION)/workdir/TrackReconstruction_functions.py,$(HOME_LOCATION)/workdir/TrackReconstruction.py
 
 # Transfer output files
-transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/reco/$(MODEL)_$(NME)_$(PRESS)_$(Cluster)_$(NewProcess).txt"
+transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/reco/$(BINNING)/$(MODEL)_$(NME)_$(PRESS)_$(Cluster)_$(NewProcess).txt"
 
 # Specify Job duration category as "Medium" (expected runtime <10 hr) or "Long" (expected runtime <20 hr). 
 +JobDurationCategory = "Medium"
