@@ -57,7 +57,8 @@ sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${JOBID}.txt
 
 # Run the reco
 echo "Running Reco" 
-python3 TrackReconstruction.py ${H5FILE} "segment_${JOBID}.txt" "${MODEL}_${NME}_${PRESS}_${BINNING}"  
+# python3 TrackReconstruction.py ${H5FILE} "segment_${JOBID}.txt" "${MODEL}_${NME}_${PRESS}_${BINNING}"  
+python3 kinematics_reconstruction.py ${H5FILE} "segment_${JOBID}.txt" "${MODEL}_${NME}_${PRESS}_${BINNING}" 
 
 ls -ltrh
 
