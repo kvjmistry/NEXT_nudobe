@@ -12,7 +12,7 @@ import sys
 def RunReco(data, part):
 
     # There seems to be a duplicate row sometimes
-    data = data.drop_duplicates()
+    # data = data.drop_duplicates()
 
     # display(data)
     data = data[['x', 'y', 'z',"energy"]]
