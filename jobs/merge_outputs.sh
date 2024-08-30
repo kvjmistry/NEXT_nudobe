@@ -12,7 +12,7 @@ for smear in "${smear_values[@]}"; do
 
 
     echo "${smear}"
-    PATHS=/ospool/ap40/data/krishan.mistry/job/nudobe/${Model}/${NME}/${PRESSURE}/reco_v0/${smear}/
+    PATHS=/ospool/ap40/data/krishan.mistry/job/nudobe/${Model}/${NME}/${PRESSURE}/reco_v1/${smear}/
 
     # Initialize the merged file
     echo "" > merged/${Model}_${NME}_${PRESSURE}_${smear}_reco_merged.txt
