@@ -40,9 +40,9 @@ arguments = $(NewProcess) $(jobname) $(MODEL) $(NME) $(PRESS) $(BINNING) $(N_JOB
 
 # Specify the name of the log, standard error, and standard output (or "screen output") files. Wherever you see $(Cluster), HTCondor will insert the 
 #  queue number assigned to this set of jobs at the time of submission.
-log    = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v0/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).log
-error  = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v0/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).err
-output = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v0/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
+log    = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v1/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).log
+error  = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v1/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).err
+output = logs/$(MODEL)/$(NME)/$(PRESS)/trackreco_v1/$(BINNING)/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
 
 # Transfer input files
 # transfer_input_files = $(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_$(BINNING).h5,$(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MODEL)_events.txt,$(HOME_LOCATION)/workdir/TrackReconstruction_functions.py,$(HOME_LOCATION)/workdir/TrackReconstruction.py
@@ -50,7 +50,7 @@ transfer_input_files = $(OSDF_LOCATION)/job/nudobe/$(MODEL)/$(NME)/$(PRESS)/$(MO
 
 # Transfer output files
 # transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/reco/$(BINNING)/$(MODEL)_$(NME)_$(PRESS)_$(Cluster)_$(NewProcess).txt"
-transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/reco_v0/$(BINNING)/$(MODEL)_$(NME)_$(PRESS)_$(Cluster)_$(NewProcess).txt"
+transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)/reco_v1/$(BINNING)/$(MODEL)_$(NME)_$(PRESS)_$(Cluster)_$(NewProcess).txt"
 
 # Specify Job duration category as "Medium" (expected runtime <10 hr) or "Long" (expected runtime <20 hr). 
 +JobDurationCategory = "Medium"

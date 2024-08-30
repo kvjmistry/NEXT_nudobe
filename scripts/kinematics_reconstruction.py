@@ -422,6 +422,9 @@ for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
     nhits = len(df_hits)
     df_hits = add_global_hit_id_column_fun() # unique hit ids per event rather than hit ids per particle
     df_hits = add_distance_column_fun()      # column for the distance of the hit to (0,0,0)
+    vertex_index = df_hits['distance'].idxmin()
+    E_vertex = df_hits.loc[vertex_index, 'energy'] # Get the energy of the vertex
+    df_hits = df_hits.drop(vertex_index) # Remove it
 
     # Step 1: Generator-level $T_1$ and $\cos\theta$
     T1_gen, costheta_gen = gen_quantities_fun()
@@ -434,6 +437,8 @@ for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
     else:
         raise SystemExit('Unrecognized reco seed method, stop executing!')
     T1_reco, costheta_reco = reco_quantities_fun()
+
+    T1_reco = T1_reco + E_vertex/2.0 # Add the vertex energy to the reconstruction 
 
     print(evt_id,',',T1_gen,',',costheta_gen,',',T1_reco,',',costheta_reco)
 
