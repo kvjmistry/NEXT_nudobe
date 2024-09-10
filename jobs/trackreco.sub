@@ -9,16 +9,16 @@ MODEL=mbb
 
 # Nuclear Matrix Elements
 NME=SM
-# NME=IBM2
-# NME=QRPA
+#NME=IBM2
+#NME=QRPA
 
-# PRESSs
+#PRESSURES
 PRESS=1bar
-# PRESS=3bar
-# PRESS=5bar
-# PRESS=7bar
-# PRESS=10bar
-# PRESS=15bar
+#PRESS=3bar
+#PRESS=5bar
+#PRESS=7bar
+#PRESS=10bar
+#PRESS=15bar
 
 BINNING=1mm_smear
 #BINNING=2mm_smear
@@ -26,7 +26,7 @@ BINNING=1mm_smear
 #BINNING=10mm_smear
 #BINNING=nexus
 
-N_JOBS=1000
+N_JOBS=200
 
 OSDF_LOCATION=osdf:///ospool/ap40/data/krishan.mistry
 HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe
