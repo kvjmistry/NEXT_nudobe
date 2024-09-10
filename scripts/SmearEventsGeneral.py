@@ -301,6 +301,7 @@ for index, e in enumerate(hits.event_id.unique()):
 
 
 df_smear_merge = pd.concat(df_smear, ignore_index=True)
+df_smear_merge = df_smear_merge.drop_duplicates() # Sometimes there is a duplicate and I dont know why
 
 print("Saving events to file: ", sys.argv[1]+"_"+str(binsize)+"mm_smear.h5")
 with pd.HDFStore(sys.argv[1]+"_"+str(binsize)+"mm_smear.h5", mode='w', complevel=5, complib='zlib') as store:
