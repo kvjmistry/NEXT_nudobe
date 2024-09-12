@@ -14,7 +14,7 @@ import sys
 infile     = sys.argv[1]
 event_file = sys.argv[2]
 model      = sys.argv[3]
-file_out = f"{model}_reco.txt"
+file_out = f"{model}.txt"
 
 # Event, when testing on single events
 #evt_id = 0
@@ -39,6 +39,7 @@ df_hits_allevts = pd.read_hdf(infile, "MC/hits")
 df_hits_allevts = df_hits_allevts[df_hits_allevts.event_id.isin(event_list)]
 
 nevts = len(df_particles_allevts.event_id.unique())
+event_ids = df_particles_allevts.event_id.unique()
 print("Number of events: ", nevts)
 
 # ----------------------------------------
@@ -56,6 +57,41 @@ def costheta_fun(p1x,p1y,p1z,p2x,p2y,p2z):
     p2 = np.sqrt(p2x**2 + p2y**2 + p2z**2)
     costheta = (p1x*p2x + p1y*p2y + p1z*p2z) / (p1*p2)
     return costheta
+# ----------------------------------------
+def TrackDir(Track, vertex):
+    # Convert values to an array
+    track_arr = Track[['x', 'y', 'z']].to_numpy()
+    return track_arr[0] - vertex
+# ----------------------------------------
+def CalcTrackAngle(Track1, Track2, vertex):
+
+    t1_delta = 0
+    # t2_delta = 0
+
+    dir_track1 = TrackDir(Track1, vertex)
+    dir_track2 = TrackDir(Track2, vertex)
+
+    cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
+
+    # Just check that first hit was not reco in the wrong direction for track 1
+    if (np.abs(cosine) > 0.97 and len(Track1) > 1):
+        dir_track1 = TrackDir(Track1.iloc[1:2], vertex)
+        dir_track2 = TrackDir(Track2, vertex)
+        cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
+
+        t1_delta = -Track1.iloc[1:2].energy.item()
+        # t2_delta = Track1.iloc[1:2].energy.item()
+
+    # Just check that first hit was not reco in the wrong direction for track 2
+    if (np.abs(cosine) > 0.97  and len(Track2) > 1):
+        dir_track1 = TrackDir(Track1, vertex)
+        dir_track2 = TrackDir(Track2.iloc[1:2], vertex)
+        cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
+
+        t1_delta = Track2.iloc[1:2].energy.item()
+        # t2_delta = -Track2.iloc[1:2].energy.item()
+
+    return cosine, t1_delta
 # ----------------------------------------
 # Find primary ancestor id of a particle in the particle df
 def ancestor_id_fun(particle_id_in):
@@ -130,8 +166,8 @@ def add_global_hit_id_column_fun():
     df_hits = df_hits.assign(global_hit_id = np.arange(nhits))
     return df_hits
 # ----------------------------------------
-def add_distance_column_fun():
-    global df_hits
+def add_distance_column_fun(df_hits):
+    # global df_hits
     # Add hit distance to vertex, to the hits dataframe. Note that this assumes that vertex is  (0,0,0) for all events
     df_hits['distance'] = np.sqrt(df_hits.x**2 + df_hits.y**2 + df_hits.z**2)
     return df_hits
@@ -369,36 +405,12 @@ def reco_quantities_fun():
     #print(T1_reco,T2_reco,T1_reco+T2_reco)
     
     # cotheta_reco
-    # Start by dealing with hits near the vertex, until one hit has a distance exceeding the maximum radius.
-    # If all hits meet the condition (n_outer_hits = 0), then include them all
+    if (len(df_e1reco_hits) == 0 or len(df_e2reco_hits) == 0):
+        return -999,-999        
 
-    # First, e1. Find first row that does not meet distance requirement. Then subtract one for last reco_hit_id to be included
-    n_outer_hits = len(df_e1reco_hits[df_e1reco_hits.distance > R])
-    if (n_outer_hits > 0):
-        reco_hit_id_max = df_e1reco_hits[df_e1reco_hits.distance > R].reco_hit_id.iloc[0] - 1
-    else:
-        reco_hit_id_max = df_e1reco_hits.reco_hit_id.max()
-
-    df_e1reco_sel_hits = df_e1reco_hits[df_e1reco_hits.reco_hit_id <= reco_hit_id_max]
-    #df_e1recosel_hits
-
-    # Second e2. Find first row that does not meet distance requirement. Then add one for last reco_hit_id to be included
-    n_outer_hits = len(df_e2reco_hits[df_e2reco_hits.distance > R])
-    if (n_outer_hits > 0):
-        reco_hit_id_min = df_e2reco_hits[df_e2reco_hits.distance > R].reco_hit_id.iloc[0] + 1
-    else:
-        reco_hit_id_min = df_e2reco_hits.reco_hit_id.min()
-
-    df_e2reco_sel_hits = df_e2reco_hits[df_e2reco_hits.reco_hit_id >= reco_hit_id_min]
-    #df_e2recosel_hits
+    costheta_reco, t1_delta = CalcTrackAngle(df_e1reco_hits, df_e2reco_hits, np.array([0,0,0]))
     
-    # Third, do the two line fits and compute the opening angle among them
-    v1x, v1y, v1z = line_fit_fun(df_e1reco_sel_hits)
-    v2x, v2y, v2z = line_fit_fun(df_e2reco_sel_hits)
-    costheta_reco = costheta_fun(v1x,v1y,v1z,v2x,v2y,v2z)
-    #print(costheta_reco)
-    
-    return T1_reco, costheta_reco
+    return T1_reco+t1_delta, costheta_reco
 # ----------------------------------------
 # ----------------------------------------
 
@@ -408,28 +420,48 @@ T1_gen_arr = np.zeros(nevts)
 costheta_gen_arr = np.zeros(nevts)
 T1_reco_arr = np.zeros(nevts)
 costheta_reco_arr = np.zeros(nevts)
+T1_true_arr = np.zeros(nevts)
+costheta_true_arr = np.zeros(nevts)
 
 # Header
 print('event_id, T1_gen, costheta_gen, T1_reco, costheta_reco')
 
 # Event loop should go here
-for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
+for index, evt_id in enumerate(event_ids):
+
+    print("On Event:", index)
 
     # Only particles and hits from event_id = evt_id, to deal one event at the time
     df_particles = df_particles_allevts[df_particles_allevts.event_id == evt_id]
     df_hits = df_hits_allevts[df_hits_allevts.event_id == evt_id]
 
-    nhits = len(df_hits)
-    df_hits = add_global_hit_id_column_fun() # unique hit ids per event rather than hit ids per particle
-    df_hits = add_distance_column_fun()      # column for the distance of the hit to (0,0,0)
+    df_hits = add_distance_column_fun(df_hits)
+
     vertex_index = df_hits['distance'].idxmin()
     E_vertex = df_hits.loc[vertex_index, 'energy'] # Get the energy of the vertex
-    df_hits = df_hits.drop(vertex_index) # Remove it
+    # print(df_hits.loc[vertex_index])
+    
+    # Drop the closest node to the vertex only if nexus is not in the filename
+    if ("nexus" not in infile):
+        df_hits = df_hits.drop(vertex_index) # Remove it
+        df_hits = df_hits.reset_index()
 
+    
+    nhits = len(df_hits)
+    df_hits = add_global_hit_id_column_fun()
+    
     # Step 1: Generator-level $T_1$ and $\cos\theta$
     T1_gen, costheta_gen = gen_quantities_fun()
+    
 
-    # Step 2: Reco-level $T_1$ and $\cos\theta$
+    # Step 2: Truth-level $T_1$ and $\cos\theta$
+    if ("nexus" not in infile):
+        T1_true, costheta_true = 0,0
+    else:
+        df_hits = add_ancestor_id_column_fun()
+        T1_true, costheta_true = true_quantities_fun()
+
+    # Step 3: Reco-level $T_1$ and $\cos\theta$
     if (reco_seed_method == 'vertex_seed'):
         df_hits = add_reco_hit_id_column_vertex_seed_fun()
     elif (reco_seed_method == 'endtrack_seed'):
@@ -438,13 +470,20 @@ for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
         raise SystemExit('Unrecognized reco seed method, stop executing!')
     T1_reco, costheta_reco = reco_quantities_fun()
 
-    T1_reco = T1_reco + E_vertex/2.0 # Add the vertex energy to the reconstruction 
+    # Add split vertex energy to T1
+    if ("nexus" not in infile):
+        T1_reco = T1_reco + E_vertex/2.0
 
-    print(evt_id,',',T1_gen,',',costheta_gen,',',T1_reco,',',costheta_reco)
+    # if (evt_id % 100) == 0:
+    print(evt_id,',',T1_gen,',',costheta_gen,',',T1_true,',',costheta_true,',',T1_reco,',',costheta_reco)
+
+    # hits.append(df_hits)
 
     event_id_arr[index] = evt_id
     T1_gen_arr[index] = T1_gen
     costheta_gen_arr[index] = costheta_gen
+    T1_true_arr[index] = T1_true
+    costheta_true_arr[index] = costheta_true
     T1_reco_arr[index] = T1_reco
     costheta_reco_arr[index] = costheta_reco
 
@@ -453,8 +492,10 @@ for index, evt_id in enumerate(sorted(df_particles_allevts.event_id.unique())):
 mydict_reco = {'event_id':event_id_arr,
            'T1_gen':T1_gen_arr,
            'costheta_gen':costheta_gen_arr,
+           'T1_true':T1_true_arr,
+           'costheta_true':costheta_true_arr,
            'T1_reco':T1_reco_arr,
            'costheta_reco':costheta_reco_arr}
 
 df_reco = pd.DataFrame(mydict_reco) 
-df_reco.to_csv(file_out, sep=',', index=False, header=False) 
+df_reco.to_csv(file_out, sep=',', index=False, header=True) 
