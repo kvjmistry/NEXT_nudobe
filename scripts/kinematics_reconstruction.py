@@ -74,7 +74,7 @@ def CalcTrackAngle(Track1, Track2, vertex):
     cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
 
     # Just check that first hit was not reco in the wrong direction for track 1
-    if (np.abs(cosine) > 0.97 and len(Track1) > 1):
+    if (cosine > 0.97 and len(Track1) > 1):
         dir_track1 = TrackDir(Track1.iloc[1:2], vertex)
         dir_track2 = TrackDir(Track2, vertex)
         cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
@@ -83,7 +83,7 @@ def CalcTrackAngle(Track1, Track2, vertex):
         # t2_delta = Track1.iloc[1:2].energy.item()
 
     # Just check that first hit was not reco in the wrong direction for track 2
-    if (np.abs(cosine) > 0.97  and len(Track2) > 1):
+    if (cosine > 0.97  and len(Track2) > 1):
         dir_track1 = TrackDir(Track1, vertex)
         dir_track2 = TrackDir(Track2.iloc[1:2], vertex)
         cosine = costheta_fun(dir_track1[0], dir_track1[1], dir_track1[2], dir_track2[0], dir_track2[1], dir_track2[2])
