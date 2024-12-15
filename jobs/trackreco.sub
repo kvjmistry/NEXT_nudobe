@@ -26,7 +26,7 @@ BINNING=1mm_smear
 #BINNING=10mm_smear
 #BINNING=nexus
 
-N_JOBS=200
+N_JOBS=500
 
 OSDF_LOCATION=osdf:///ospool/ap40/data/krishan.mistry
 HOME_LOCATION=/home/krishan.mistry/code/NEXT_nudobe
@@ -56,7 +56,7 @@ transfer_output_remaps = "$(MODEL)_$(NME)_$(PRESS)_$(BINNING)_reco.txt = $(OSDF_
 +JobDurationCategory = "Medium"
 
 # Use a singularity image to submit the file. The image should be stored in the protected area of your workspace
-+SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC_nudobe4.sif"
++SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC3.sif"
 
 
 # Tell HTCondor requirements (e.g., operating system) your job needs, 
