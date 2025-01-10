@@ -49,14 +49,14 @@ transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/
 +JobDurationCategory = "Medium"
 
 # Use a singularity image to submit the file. The image should be stored in the protected area of your workspace
-+SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC3.sif"
++SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC5.sif"
 
 
 # Tell HTCondor requirements (e.g., operating system) your job needs, 
 # what amount of compute resources each job will need on the computer where it runs.
-requirements = (Arch == "X86_64")
+requirements = (Arch == "X86_64" && TARGET.GLIDEIN_ResourceName =!= "Lehigh - Hawk" && TARGET.GLIDEIN_ResourceName =!= "UA-LR-ITS-EP")
 request_cpus = 1
-request_memory = 4GB
+request_memory = 5GB
 request_disk = 5GB
 
 # If submitting more than 10k jobs use this statement

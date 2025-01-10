@@ -1,6 +1,6 @@
 # Script to untar and merge
 
-model="Leptoquark"
+model="mbb"
 NME="SM"
 PRESS=1bar
 

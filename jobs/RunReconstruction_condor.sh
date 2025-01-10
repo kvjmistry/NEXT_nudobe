@@ -24,7 +24,7 @@ echo "Binning is: ${BINNING}"
 
 # Set the configurable variables
 N_JOBS=$7
-echo "Segement Size is: ${N_JOBS}"
+echo "N_JOBS is: ${N_JOBS}"
 
 start=`date +%s`
 
@@ -39,21 +39,28 @@ echo "EVENTFILE is: ${EVENTFILE}"
 
 
 # Get the total number of lines in the file
-total_lines=$(wc -l < ${EVENTFILE})
+total_lines=$(wc -l < "${EVENTFILE}")
 
 # Calculate the size of each segment
 segment_size=$((total_lines / N_JOBS))
+remainder=$((total_lines % N_JOBS))  # Handle leftover lines
+echo "segment_size is: ${segment_size}"
+echo "remainder is: ${remainder}"
 
-# Calculate the starting line for the nth segment
-start_line=$((segment_size * $JOBID + 1))
+# Calculate the starting and ending line for the nth segment
+start_line=$((segment_size * JOBID + 1))
+end_line=$((segment_size * (JOBID + 1)))
+
+# Add the remainder lines to the last job
+if [ "$JOBID" -eq $((N_JOBS - 1)) ]; then
+    end_line=$total_lines
+fi
+
 echo "Start line is: ${start_line}"
-
-# Calculate the ending line for the 5th segment
-end_line=$((segment_size * $(($JOBID+1))))
 echo "End line is: ${end_line}"
 
 # Extract the segment and save it to a new file so we can read this in for the job
-sed -n "${start_line},${end_line}p" ${EVENTFILE} > segment_${JOBID}.txt
+sed -n "${start_line},${end_line}p" "${EVENTFILE}" > "segment_${JOBID}.txt"
 
 # Run the reco
 echo "Running Reco" 
@@ -67,7 +74,7 @@ echo; echo; echo;
 rm segment_${JOBID}.txt
 
 # Check for the exit file
-if [ ! -e "${MODEL}_${NME}_${PRESS}_${BINNING}_reco.txt" ]; then
+if [ ! -e "${MODEL}_${NME}_${PRESS}_${BINNING}.txt" ]; then
   echo "Error: File does not exist, returning with STATUS 1."
   exit 1
 fi

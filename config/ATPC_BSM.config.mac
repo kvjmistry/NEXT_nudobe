@@ -6,7 +6,9 @@
 
 # GENERATION
 /Generator/ElecPair/region AD_HOC
-/Generator/ElecPair/dist_file data/nudobe/Leptoquark_SM.txt
+/Generator/ElecPair/dist_file mbb_SM.txt
+/Generator/ElecPair/randomindex false
+/Generator/ElecPair/verbosity false
 
 
 ## Nexus Physics List
@@ -16,15 +18,15 @@
 
 #GEOMETRY
 /Geometry/ATPC/gas_pressure 5. bar
-/Geometry/ATPC/cube_size  6 m
+/Geometry/ATPC/cube_size  500 m
 /Geometry/ATPC/chamber_thickn 5 cm
-/Geometry/ATPC/max_step_size 1 mm
+/Geometry/ATPC/max_step_size 4 mm
 
-/nexus/random_seed 12
-/nexus/persistency/start_id 12
+/nexus/random_seed 50
+/nexus/persistency/start_id 50
 
-/Actions/DefaultEventAction/min_energy 2.43 MeV
-/Actions/DefaultEventAction/max_energy 2.6 MeV
+#/Actions/DefaultEventAction/min_energy 2.43 MeV
+#/Actions/DefaultEventAction/max_energy 2.6 MeV
 
 # PERSISTENCY
 #/nexus/persistency/eventType background
