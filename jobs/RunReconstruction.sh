@@ -39,8 +39,8 @@ echo "EVENTFILE is: ${EVENTFILE}"
 
 
 # Create the directory
-mkdir -p "${MODEL}_${NME}_${PRESSURE}_${BINNING}"
-cd "${MODEL}_${NME}_${PRESSURE}_${BINNING}"
+mkdir -p "${MODEL}/${NME}/${PRESSURE}/${BINNING}"
+cd "${MODEL}/${NME}/${PRESSURE}/${BINNING}"
 
 # Setup VENV so we have python
 echo "Setting Up Python" 
