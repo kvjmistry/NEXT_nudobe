@@ -7,13 +7,14 @@ from scipy.sparse.csgraph import minimum_spanning_tree
 import networkx as nx
 import sys
 
+pd.options.mode.chained_assignment = None  # or 'warn' to re-enable
+
 # USAGE: python kinematics_reconstruction.py <infile> <eventfile> <model>
-# python kinematics_reconstruction.py "Leptoquark_SM_nexus.h5"  "Leptoquark_SM_events.txt" "Leptoquark_SM"
+# python kinematics_reconstruction.py "mbb_10mm_smear_15bar.h5  "mbb_SM_15bar_10mm_smear"
 
 # Input file
 infile     = sys.argv[1]
-event_file = sys.argv[2]
-model      = sys.argv[3]
+model      = sys.argv[2]
 file_out = f"{model}.txt"
 
 # Event, when testing on single events
@@ -26,20 +27,14 @@ R = 12 #mm
 reco_seed_method = 'vertex_seed'
 #reco_seed_method = 'endtrack_seed'
 
-# Load in a file with the events to process
-with open(event_file, 'r') as file:
-    event_list = [int(line.strip()) for line in file]
-
 # Particles dataframe.
 df_particles_allevts = pd.read_hdf(infile, "MC/particles")
-df_particles_allevts = df_particles_allevts[df_particles_allevts.event_id.isin(event_list)]
 
 # Hits dataframe.
 df_hits_allevts = pd.read_hdf(infile, "MC/hits")
-df_hits_allevts = df_hits_allevts[df_hits_allevts.event_id.isin(event_list)]
 
 nevts = len(df_particles_allevts.event_id.unique())
-event_ids = df_particles_allevts.event_id.unique()
+event_ids = sorted(df_particles_allevts.event_id.unique())
 print("Number of events: ", nevts)
 
 # ----------------------------------------
@@ -429,7 +424,7 @@ print('event_id, T1_gen, costheta_gen, T1_reco, costheta_reco')
 # Event loop should go here
 for index, evt_id in enumerate(event_ids):
 
-    print("On Event:", index)
+    print("On Event:", index+25, evt_id, ((index+25)/evt_id))
 
     # Only particles and hits from event_id = evt_id, to deal one event at the time
     df_particles = df_particles_allevts[df_particles_allevts.event_id == evt_id]
