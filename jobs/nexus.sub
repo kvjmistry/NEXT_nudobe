@@ -4,8 +4,8 @@
 jobname=nudobe
 
 # BSM Models
-MODEL=mbb
-#MODEL=Leptoquark
+# MODEL=mbb
+MODEL=Leptoquark
 
 # Nuclear Matrix Elements
 NME=SM
@@ -40,7 +40,7 @@ error  = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewPro
 output = logs/$(MODEL)/$(NME)/$(PRESS)bar/jobid$(NewProcess)/$(Cluster)_$(NewProcess).out
 
 # Transfer input files
-transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/scripts/SmearEventsGeneral.py,$(HOME_LOCATION)/scripts/CompressEvents.py,$(HOME_LOCATION)/files/$(MODEL)_$(NME).txt
+transfer_input_files = $(HOME_LOCATION)/config/$(INIT),$(HOME_LOCATION)/config/$(CONFIG),$(HOME_LOCATION)/scripts/SmearEvents.py,$(HOME_LOCATION)/scripts/CompressEvents.py,$(HOME_LOCATION)/files/$(MODEL)_$(NME).txt
 
 # Transfer output files
 transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/$(NME)/$(PRESS)bar/$(MODEL)_$(NME)_$(PRESS)bar_$(Cluster)_$(NewProcess).tar"
@@ -49,7 +49,7 @@ transfer_output_remaps = "nudobe.tar = $(OSDF_LOCATION)/job/$(jobname)/$(MODEL)/
 +JobDurationCategory = "Medium"
 
 # Use a singularity image to submit the file. The image should be stored in the protected area of your workspace
-+SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC5.sif"
++SingularityImage = "$(OSDF_LOCATION)/containers/docker_nexus_ATPC11.sif"
 
 
 # Tell HTCondor requirements (e.g., operating system) your job needs, 
