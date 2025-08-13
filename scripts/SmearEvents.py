@@ -161,6 +161,7 @@ for index, e in enumerate(hits.event_id.unique()):
     # Select the event
     event = hits[hits.event_id == e]
     event_part = parts[parts.event_id == e]
+    event["n"] = round(event["energy"]/E_mean)
     
     # Shift z-values so 0 is at the anode
     event.z = event.z+z_shift

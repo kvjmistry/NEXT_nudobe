@@ -8,7 +8,7 @@ echo "The JOBID number is: ${JOBID}"
 JOBNAME=$2
 echo "The JOBNAME number is: ${JOBNAME}" 
 
-echo "JOBID $1 running on `whoami`@`hostname`"
+echo "JOBID ${JOBID} running on `whoami`@`hostname`"
 
 MODEL=$3
 echo "Model name is: ${MODEL}"
@@ -29,15 +29,13 @@ source /software/nexus/setup_nexus.sh
 CONFIG=ATPC_BSM.config.mac
 INIT=ATPC_BSM.init.mac
 
-echo "N_EVENTS: ${N_EVENTS}"
-
 SEED=$((${JOBID} + 1))
 echo "The seed number is: ${SEED}" 
-
 
 if [ "$PRESS" -eq 1 ]; then
     
     N_EVENTS=120
+    echo "N_EVENTS: ${N_EVENTS}"
     EID=$((${N_EVENTS}*${JOBID} + ${N_EVENTS}))
     echo "The EID number is: ${EID}" 
 
@@ -72,6 +70,7 @@ if [ "$PRESS" -eq 1 ]; then
 elif [ "$PRESS" -eq 5 ]; then
 
     N_EVENTS=80
+    echo "N_EVENTS: ${N_EVENTS}"
     EID=$((${N_EVENTS}*${JOBID} + ${N_EVENTS}))
     echo "The EID number is: ${EID}" 
 

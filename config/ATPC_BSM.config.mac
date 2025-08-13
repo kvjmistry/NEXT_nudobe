@@ -22,6 +22,8 @@
 /Geometry/ATPC/chamber_thickn 5 cm
 /Geometry/ATPC/max_step_size 1 mm
 
+/Geometry/ATPC/detgeom cylinder
+
 /nexus/random_seed 50
 /nexus/persistency/start_id 50
 
